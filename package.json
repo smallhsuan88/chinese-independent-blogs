@@ -1,25 +1,18 @@
 {
-  "name": "indie-chinese-blogs",
+  "name": "simple-blog-cli",
   "version": "1.0.0",
-  "description": "[![](https://badgen.net/badge/icon/telegram?icon=telegram&label)](https://t.me/indieBlogs) [![](https://badgen.net/badge/icon/patrons/orange?icon=patreon&label)](https://www.patreon.com/timqian)",
+  "description": "極簡部落格：僅支援新增與刪除文章的命令列工具。",
   "main": "script.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node script.js",
+    "test": "echo \"No automated tests\" && exit 0"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/timqian/indie-chinese-blogs.git"
-  },
-  "keywords": [],
+  "keywords": [
+    "blog",
+    "cli",
+    "add",
+    "delete"
+  ],
   "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/timqian/indie-chinese-blogs/issues"
-  },
-  "homepage": "https://github.com/timqian/indie-chinese-blogs#readme",
-  "dependencies": {
-    "graphql": "^16.8.1",
-    "graphql-request": "^4.3.0",
-    "markdown-table": "^1.1.3"
-  }
+  "license": "ISC"
 }
