@@ -1,6 +1,6 @@
 # 極簡部落格
 
-提供極簡但完整的部落格體驗：文章列表（僅 published）、全文搜尋、分類/標籤瀏覽、Markdown 內頁、上一篇/下一篇、相關文章、私密預覽草稿、基本 SEO（title/meta/OG/canonical/sitemap/robots）與最小可用 CMS。
+提供極簡但完整的部落格體驗：文章列表（僅 published）、全文搜尋、分類/標籤瀏覽、Markdown 內頁、上一篇/下一篇、相關文章、私密預覽草稿與最小可用 CMS。
 
 ## 圖形介面使用方式
 
@@ -9,8 +9,7 @@
 3. 列表只顯示 published 文章，含封面、摘要、分類、標籤、發佈日期與估算閱讀時間，並支援分頁。
 4. 內頁使用 slug（例：`#/blog/does-name-affect-life`）渲染 Markdown（含 code block、引用、圖片、表格），自動產生 TOC、上一篇/下一篇與相關文章（分類或標籤）。
 5. 分類/標籤頁：`#/category/:slug`、`#/tag/:slug`。搜尋頁：`#/search?q=keyword`（搜尋標題/摘要/內容）。
-6. 後台管理列出全部文章（含 draft），可編輯/刪除並取得草稿私密預覽連結（`#/blog/:slug?preview=token`）。
-7. SEO：每頁更新 title/meta/OG/canonical，並可下載自動產生的 `sitemap.xml`、`robots.txt`。
+6. 後台管理列出全部文章（含 draft），可編輯/刪除並取得草稿私密預覽連結（`#/blog/:slug?preview=token`），並可編輯「關於、聯絡、隱私權政策、免責聲明」四個靜態頁面。
 
 > 文章資料僅存放於瀏覽器 localStorage（本機）。
 
