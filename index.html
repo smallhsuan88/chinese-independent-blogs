@@ -1495,6 +1495,10 @@
       };
       saveStaticPages(updated);
       staticStatus.textContent = '已儲存靜態頁面內容';
+      const { segments } = parseHash();
+      if (segments[0] === 'page' && segments[1]) {
+        renderStaticPage(segments[1]);
+      }
       setTimeout(() => {
         staticStatus.textContent = '';
       }, 2000);
