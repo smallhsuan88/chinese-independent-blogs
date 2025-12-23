@@ -442,6 +442,27 @@
       return slice + (trimmed.length > 120 ? '…' : '');
     }
 
+    async function fetchPostsFromFile() {
+      try {
+        const response = await fetch('posts.json', { cache: 'no-store' });
+        if (!response.ok) return [];
+        const data = await response.json();
+        return Array.isArray(data) ? data : [];
+      } catch {
+        return [];
+      }
+    }
+
+    async function bootstrapPosts() {
+      const stored = loadPosts();
+      if (stored.length > 0) return;
+
+      const seeded = await fetchPostsFromFile();
+      if (seeded.length > 0) {
+        savePosts(seeded.map(normalizePost));
+      }
+    }
+
     function estimateReadingTime(content) {
       const pureText = (content || '').replace(/\s+/g, '');
       const minutes = Math.max(1, Math.ceil(pureText.length / 500));
@@ -655,8 +676,13 @@
       postForm.classList.remove('visible');
     });
 
-    setDefaultPublishDate();
-    renderPosts();
+    async function init() {
+      setDefaultPublishDate();
+      await bootstrapPosts();
+      renderPosts();
+    }
+
+    init();
   </script>
 </body>
 </html>
