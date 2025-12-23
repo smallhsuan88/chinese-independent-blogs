@@ -3,169 +3,401 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>極簡部落格</title>
+  <title>極簡部落格｜文章列表</title>
   <style>
     :root {
       color-scheme: light dark;
-      --bg: #f7f7f7;
+      --bg: #f6f7fb;
       --card: #ffffff;
-      --text: #111111;
-      --border: #e0e0e0;
-      --accent: #3b82f6;
+      --text: #111827;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --accent: #2563eb;
+      --accent-soft: #eff6ff;
+      --danger: #dc2626;
+      --tag: #f3f4f6;
     }
+
     @media (prefers-color-scheme: dark) {
       :root {
         --bg: #0f172a;
-        --card: #1e293b;
+        --card: #0b1222;
         --text: #e2e8f0;
-        --border: #334155;
+        --muted: #94a3b8;
+        --border: #1e293b;
         --accent: #60a5fa;
+        --accent-soft: #0b1b38;
+        --danger: #f87171;
+        --tag: #1f2937;
       }
     }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
       font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, -apple-system, sans-serif;
-      background: var(--bg);
+      background: radial-gradient(circle at 10% 20%, rgba(37, 99, 235, 0.08), transparent 20%),
+        radial-gradient(circle at 90% 10%, rgba(16, 185, 129, 0.08), transparent 18%),
+        var(--bg);
       color: var(--text);
       display: flex;
       justify-content: center;
-      padding: 32px 16px 64px;
+      padding: 36px 16px 72px;
     }
+
     .container {
-      width: min(960px, 100%);
+      width: min(1040px, 100%);
     }
-    h1 {
-      margin-top: 0;
-      margin-bottom: 16px;
-      letter-spacing: 0.02em;
-    }
-    .actions {
+
+    .page-header {
       display: flex;
-      align-items: center;
-      gap: 12px;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
       margin-bottom: 20px;
       flex-wrap: wrap;
     }
+
+    .eyebrow {
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 12px;
+      color: var(--muted);
+      margin: 0 0 6px;
+      font-weight: 700;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      letter-spacing: 0.01em;
+      font-size: clamp(26px, 3vw, 32px);
+    }
+
+    .lead {
+      margin: 0;
+      color: var(--muted);
+      max-width: 640px;
+      line-height: 1.6;
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
     button {
       background: var(--accent);
       color: #fff;
       border: none;
-      border-radius: 8px;
-      padding: 10px 16px;
-      font-size: 16px;
+      border-radius: 12px;
+      padding: 11px 16px;
+      font-size: 15px;
       cursor: pointer;
-      transition: transform 0.05s ease, box-shadow 0.15s ease;
+      transition: transform 0.05s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
+
     button:hover {
       transform: translateY(-1px);
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+      box-shadow: 0 10px 24px rgba(37, 99, 235, 0.18);
     }
+
     button:active {
       transform: translateY(0);
       box-shadow: none;
+      opacity: 0.9;
     }
+
+    button.secondary {
+      background: var(--tag);
+      color: var(--text);
+      box-shadow: inset 0 0 0 1px var(--border);
+    }
+
+    button.danger {
+      background: var(--danger);
+      box-shadow: none;
+    }
+
     form {
       background: var(--card);
       border: 1px solid var(--border);
-      border-radius: 12px;
+      border-radius: 16px;
       padding: 16px;
       margin-bottom: 20px;
       display: none;
+      box-shadow: 0 12px 24px rgba(15, 23, 42, 0.06);
     }
+
     form.visible {
       display: block;
     }
+
+    form .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px 16px;
+    }
+
     label {
       display: block;
       margin-bottom: 4px;
-      font-weight: 600;
+      font-weight: 700;
+      font-size: 14px;
     }
+
     input[type="text"],
-    textarea {
+    input[type="date"],
+    textarea,
+    select {
       width: 100%;
       box-sizing: border-box;
       padding: 10px 12px;
-      border-radius: 8px;
+      border-radius: 10px;
       border: 1px solid var(--border);
-      font-size: 15px;
+      font-size: 14px;
       background: var(--bg);
       color: var(--text);
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
+
     textarea {
       resize: vertical;
       min-height: 120px;
     }
+
     .posts {
       display: grid;
       gap: 16px;
+      margin-top: 12px;
     }
+
     .post {
       background: var(--card);
       border: 1px solid var(--border);
-      border-radius: 12px;
+      border-radius: 16px;
       padding: 16px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
+      box-shadow: 0 10px 26px rgba(15, 23, 42, 0.06);
+      display: grid;
+      gap: 12px;
     }
+
+    .cover {
+      width: 100%;
+      border-radius: 12px;
+      height: 200px;
+      object-fit: cover;
+      border: 1px solid var(--border);
+      background: var(--tag);
+    }
+
     .post header {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 8px;
+      align-items: flex-start;
+      gap: 12px;
     }
+
     .post h2 {
       margin: 0;
       font-size: 20px;
       line-height: 1.3;
     }
-    .meta {
-      font-size: 13px;
-      color: #6b7280;
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: 0.02em;
+      border: 1px solid var(--border);
+      white-space: nowrap;
     }
+
+    .meta,
+    .post-meta {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .post-meta {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag {
+      background: var(--tag);
+      color: var(--text);
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      border: 1px solid var(--border);
+    }
+
     .empty {
       text-align: center;
-      color: #6b7280;
+      color: var(--muted);
       font-size: 15px;
       padding: 32px 0;
+      border: 1px dashed var(--border);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.4);
     }
-    .danger {
-      background: #dc2626;
+
+    .list-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .pagination {
+      display: flex;
+      gap: 8px;
+    }
+
+    .reading-time {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--tag);
+      padding: 6px 10px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      font-size: 12px;
+    }
+
+    @media (max-width: 640px) {
+      body {
+        padding: 20px 12px 56px;
+      }
+
+      .post header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .pagination {
+        width: 100%;
+        justify-content: flex-end;
+      }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>極簡部落格</h1>
-    <div class="actions">
-      <button id="toggleForm">＋ 新增文章</button>
+    <div class="page-header">
+      <div>
+        <p class="eyebrow">文章列表</p>
+        <h1>極簡部落格</h1>
+        <p class="lead">瀏覽已發佈的文章列表，包含摘要、封面圖、分類、標籤、發佈日期與估算閱讀時間。僅顯示狀態為 published 的內容。</p>
+      </div>
+      <div class="actions">
+        <button id="toggleForm">＋ 新增文章</button>
+      </div>
     </div>
 
     <form id="postForm">
-      <div>
-        <label for="title">文章標題</label>
-        <input id="title" name="title" type="text" placeholder="請輸入標題" required>
+      <div class="grid">
+        <div>
+          <label for="title">文章標題</label>
+          <input id="title" name="title" type="text" placeholder="請輸入標題" required>
+        </div>
+        <div>
+          <label for="category">分類</label>
+          <input id="category" name="category" type="text" placeholder="例如：技術、生活" value="未分類">
+        </div>
+        <div>
+          <label for="tags">標籤（以逗號分隔）</label>
+          <input id="tags" name="tags" type="text" placeholder="JavaScript, 旅遊, 心得">
+        </div>
+        <div>
+          <label for="coverImage">封面圖 URL（可留空）</label>
+          <input id="coverImage" name="coverImage" type="text" placeholder="https://example.com/cover.jpg">
+        </div>
+        <div>
+          <label for="status">文章狀態</label>
+          <select id="status" name="status">
+            <option value="published" selected>published</option>
+            <option value="draft">draft</option>
+          </select>
+        </div>
+        <div>
+          <label for="publishedAt">發佈日期</label>
+          <input id="publishedAt" name="publishedAt" type="date">
+        </div>
       </div>
+
+      <div>
+        <label for="excerpt">摘要（未填則自動截取內容開頭）</label>
+        <textarea id="excerpt" name="excerpt" placeholder="請輸入摘要"></textarea>
+      </div>
+
       <div>
         <label for="content">文章內容</label>
         <textarea id="content" name="content" placeholder="請輸入內容" required></textarea>
       </div>
+
       <button type="submit">儲存文章</button>
     </form>
 
-    <section id="postList" class="posts"></section>
+    <section>
+      <div class="list-header">
+        <div>
+          <p class="eyebrow">列表</p>
+          <div id="pageInfo" class="meta"></div>
+        </div>
+        <div class="pagination">
+          <button id="prevPage" class="secondary" type="button">← 上一頁</button>
+          <button id="nextPage" class="secondary" type="button">下一頁 →</button>
+        </div>
+      </div>
+      <div id="postList" class="posts"></div>
+    </section>
   </div>
 
   <script>
     const storageKey = 'blogPosts';
+    const pageSize = 6;
+    let currentPage = 1;
+
     const postList = document.getElementById('postList');
     const postForm = document.getElementById('postForm');
     const toggleFormBtn = document.getElementById('toggleForm');
     const titleInput = document.getElementById('title');
     const contentInput = document.getElementById('content');
+    const excerptInput = document.getElementById('excerpt');
+    const coverInput = document.getElementById('coverImage');
+    const categoryInput = document.getElementById('category');
+    const tagsInput = document.getElementById('tags');
+    const statusInput = document.getElementById('status');
+    const publishedAtInput = document.getElementById('publishedAt');
+    const pageInfo = document.getElementById('pageInfo');
+    const prevPageBtn = document.getElementById('prevPage');
+    const nextPageBtn = document.getElementById('nextPage');
 
-    function loadPosts() {
-      const raw = localStorage.getItem(storageKey);
+    function parseJSON(raw) {
       if (!raw) return [];
       try {
         const parsed = JSON.parse(raw);
@@ -175,69 +407,236 @@
       }
     }
 
+    function loadPosts() {
+      const raw = localStorage.getItem(storageKey);
+      return parseJSON(raw);
+    }
+
     function savePosts(posts) {
       localStorage.setItem(storageKey, JSON.stringify(posts));
     }
 
     function nextId(posts) {
-      return posts.reduce((max, post) => Math.max(max, post.id || 0), 0) + 1;
+      return posts.reduce((max, post) => Math.max(max, Number(post.id) || 0), 0) + 1;
+    }
+
+    function parseDate(value) {
+      if (!value) return null;
+      const date = new Date(value);
+      return Number.isNaN(date.getTime()) ? null : date;
+    }
+
+    function formatDate(value) {
+      const date = parseDate(value);
+      if (!date) return '未知日期';
+      return date.toLocaleDateString('zh-TW', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      });
+    }
+
+    function generateExcerpt(content) {
+      const trimmed = (content || '').trim();
+      const slice = trimmed.slice(0, 120);
+      return slice + (trimmed.length > 120 ? '…' : '');
+    }
+
+    async function fetchPostsFromFile() {
+      try {
+        const response = await fetch('posts.json', { cache: 'no-store' });
+        if (!response.ok) return [];
+        const data = await response.json();
+        return Array.isArray(data) ? data : [];
+      } catch {
+        return [];
+      }
+    }
+
+    async function bootstrapPosts() {
+      const stored = loadPosts();
+      if (stored.length > 0) return;
+
+      const seeded = await fetchPostsFromFile();
+      if (seeded.length > 0) {
+        savePosts(seeded.map(normalizePost));
+      }
+    }
+
+    function estimateReadingTime(content) {
+      const pureText = (content || '').replace(/\s+/g, '');
+      const minutes = Math.max(1, Math.ceil(pureText.length / 500));
+      return `${minutes} 分鐘閱讀`;
+    }
+
+    function normalizeTags(tags) {
+      if (Array.isArray(tags)) {
+        return tags.map((tag) => String(tag).trim()).filter(Boolean);
+      }
+      if (typeof tags === 'string') {
+        return tags.split(',').map((tag) => tag.trim()).filter(Boolean);
+      }
+      return [];
+    }
+
+    function normalizePost(raw) {
+      const status = raw.status === 'draft' ? 'draft' : 'published';
+      const fallbackContent = raw.content || '';
+      return {
+        id: raw.id,
+        title: raw.title || '未命名文章',
+        content: fallbackContent,
+        excerpt: raw.excerpt?.trim() || generateExcerpt(fallbackContent),
+        coverImage: raw.coverImage?.trim() || '',
+        category: raw.category?.trim() || '未分類',
+        tags: normalizeTags(raw.tags),
+        status,
+        createdAt: raw.createdAt || new Date().toISOString(),
+        publishedAt:
+          status === 'published'
+            ? raw.publishedAt || raw.createdAt || new Date().toISOString()
+            : null,
+      };
+    }
+
+    function renderEmptyState() {
+      postList.innerHTML = '<div class="empty">目前沒有已發佈的文章，試著新增一篇吧！</div>';
+      pageInfo.textContent = '尚未有 published 文章。';
+      prevPageBtn.disabled = true;
+      nextPageBtn.disabled = true;
     }
 
     function renderPosts() {
-      const posts = loadPosts();
-      postList.innerHTML = '';
+      const allPosts = loadPosts().map(normalizePost).filter((post) => post.status === 'published');
 
-      if (posts.length === 0) {
-        postList.innerHTML = '<div class="empty">目前沒有文章，點擊「新增文章」開始撰寫。</div>';
+      if (allPosts.length === 0) {
+        renderEmptyState();
         return;
       }
 
-      posts
-        .sort((a, b) => b.id - a.id)
-        .forEach((post) => {
-          const wrapper = document.createElement('article');
-          wrapper.className = 'post';
+      allPosts.sort((a, b) => {
+        const timeA = parseDate(a.publishedAt)?.getTime() || 0;
+        const timeB = parseDate(b.publishedAt)?.getTime() || 0;
+        return timeB - timeA;
+      });
 
-          const header = document.createElement('header');
-          const title = document.createElement('h2');
-          title.textContent = post.title;
+      const totalPages = Math.max(1, Math.ceil(allPosts.length / pageSize));
+      currentPage = Math.min(currentPage, totalPages);
+      const start = (currentPage - 1) * pageSize;
+      const visible = allPosts.slice(start, start + pageSize);
 
-          const meta = document.createElement('div');
-          meta.className = 'meta';
-          meta.textContent = `#${post.id} · 建立於 ${post.createdAt}`;
+      postList.innerHTML = '';
 
-          const deleteBtn = document.createElement('button');
-          deleteBtn.textContent = '刪除';
-          deleteBtn.className = 'danger';
-          deleteBtn.onclick = () => deletePost(post.id);
+      visible.forEach((post) => {
+        const wrapper = document.createElement('article');
+        wrapper.className = 'post';
 
-          header.append(title, deleteBtn);
+        if (post.coverImage) {
+          const cover = document.createElement('img');
+          cover.className = 'cover';
+          cover.src = post.coverImage;
+          cover.alt = `${post.title} 的封面圖`;
+          wrapper.appendChild(cover);
+        }
 
-          const content = document.createElement('p');
-          content.textContent = post.content;
+        const header = document.createElement('header');
+        const title = document.createElement('h2');
+        title.textContent = post.title;
 
-          wrapper.append(header, meta, content);
-          postList.appendChild(wrapper);
-        });
+        const badge = document.createElement('span');
+        badge.className = 'badge';
+        badge.textContent = post.category;
+
+        header.append(title, badge);
+
+        const excerpt = document.createElement('p');
+        excerpt.textContent = post.excerpt;
+
+        const meta = document.createElement('div');
+        meta.className = 'post-meta';
+
+        const metaDate = document.createElement('span');
+        metaDate.textContent = `發佈於 ${formatDate(post.publishedAt)}`;
+
+        const reading = document.createElement('span');
+        reading.className = 'reading-time';
+        reading.textContent = estimateReadingTime(post.content);
+
+        meta.append(metaDate, reading);
+
+        const tags = document.createElement('div');
+        tags.className = 'tags';
+        if (post.tags.length) {
+          post.tags.forEach((tag) => {
+            const pill = document.createElement('span');
+            pill.className = 'tag';
+            pill.textContent = `#${tag}`;
+            tags.appendChild(pill);
+          });
+        }
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = '刪除';
+        deleteBtn.className = 'danger';
+        deleteBtn.onclick = () => deletePost(post.id);
+
+        wrapper.append(header, excerpt);
+        if (post.tags.length) {
+          wrapper.appendChild(tags);
+        }
+        wrapper.append(meta, deleteBtn);
+        postList.appendChild(wrapper);
+      });
+
+      pageInfo.textContent = `第 ${currentPage} / ${totalPages} 頁 · 共 ${allPosts.length} 篇 published 文章`;
+      prevPageBtn.disabled = currentPage === 1;
+      nextPageBtn.disabled = currentPage === totalPages;
     }
 
-    function addPost(title, content) {
+    function addPost(post) {
       const posts = loadPosts();
-      const post = {
-        id: nextId(posts),
-        title: title.trim(),
-        content: content.trim(),
-        createdAt: new Date().toLocaleString('zh-TW'),
-      };
       posts.push(post);
       savePosts(posts);
+      currentPage = 1;
       renderPosts();
     }
 
     function deletePost(id) {
-      const posts = loadPosts().filter((post) => post.id !== id);
-      savePosts(posts);
+      const numericId = Number(id);
+      const posts = loadPosts();
+      const filtered = posts.filter((post) => Number(post.id) !== numericId);
+      savePosts(filtered);
       renderPosts();
+    }
+
+    function buildPostFromForm() {
+      const posts = loadPosts();
+      const status = statusInput.value;
+      const publishedAtValue = publishedAtInput.value;
+      const content = contentInput.value.trim();
+      const excerpt = excerptInput.value.trim() || generateExcerpt(content);
+
+      return {
+        id: nextId(posts),
+        title: titleInput.value.trim(),
+        content,
+        excerpt,
+        coverImage: coverInput.value.trim(),
+        category: categoryInput.value.trim() || '未分類',
+        tags: normalizeTags(tagsInput.value),
+        status,
+        createdAt: new Date().toISOString(),
+        publishedAt:
+          status === 'published'
+            ? (publishedAtValue ? new Date(publishedAtValue).toISOString() : new Date().toISOString())
+            : null,
+      };
+    }
+
+    function setDefaultPublishDate() {
+      const today = new Date();
+      const yyyyMmDd = today.toISOString().split('T')[0];
+      publishedAtInput.value = yyyyMmDd;
     }
 
     toggleFormBtn.addEventListener('click', () => {
@@ -245,6 +644,18 @@
       if (postForm.classList.contains('visible')) {
         titleInput.focus();
       }
+    });
+
+    prevPageBtn.addEventListener('click', () => {
+      if (currentPage > 1) {
+        currentPage -= 1;
+        renderPosts();
+      }
+    });
+
+    nextPageBtn.addEventListener('click', () => {
+      currentPage += 1;
+      renderPosts();
     });
 
     postForm.addEventListener('submit', (event) => {
@@ -257,12 +668,21 @@
         return;
       }
 
-      addPost(title, content);
+      const post = buildPostFromForm();
+      addPost(post);
       postForm.reset();
+      setDefaultPublishDate();
+      statusInput.value = 'published';
       postForm.classList.remove('visible');
     });
 
-    renderPosts();
+    async function init() {
+      setDefaultPublishDate();
+      await bootstrapPosts();
+      renderPosts();
+    }
+
+    init();
   </script>
 </body>
 </html>

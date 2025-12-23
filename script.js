@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 const dataFile = path.join(__dirname, 'posts.json');
+const DEFAULT_CATEGORY = '未分類';
 
 function loadPosts() {
   if (!fs.existsSync(dataFile)) {
@@ -23,18 +24,40 @@ function savePosts(posts) {
 }
 
 function nextId(posts) {
-  const maxId = posts.reduce((max, post) => Math.max(max, post.id || 0), 0);
+  const maxId = posts.reduce((max, post) => Math.max(max, Number(post.id) || 0), 0);
   return maxId + 1;
 }
 
-function addPost(title, content) {
+function generateExcerpt(content) {
+  const trimmed = (content || '').trim();
+  const slice = trimmed.slice(0, 120);
+  return slice + (trimmed.length > 120 ? '…' : '');
+}
+
+function parseTags(raw) {
+  if (!raw) return [];
+  if (Array.isArray(raw)) return raw;
+  return String(raw)
+    .split(',')
+    .map((tag) => tag.trim())
+    .filter(Boolean);
+}
+
+function addPost(title, content, options = {}) {
   const posts = loadPosts();
 
+  const now = new Date().toISOString();
   const post = {
     id: nextId(posts),
     title,
     content,
-    createdAt: new Date().toISOString(),
+    excerpt: options.excerpt || generateExcerpt(content),
+    coverImage: options.coverImage || '',
+    category: options.category || DEFAULT_CATEGORY,
+    tags: parseTags(options.tags),
+    status: options.status === 'draft' ? 'draft' : 'published',
+    createdAt: now,
+    publishedAt: options.status === 'draft' ? null : options.publishedAt || now,
   };
 
   posts.push(post);
@@ -50,7 +73,7 @@ function deletePost(id) {
   }
 
   const posts = loadPosts();
-  const index = posts.findIndex((post) => post.id === numericId);
+  const index = posts.findIndex((post) => Number(post.id) === numericId);
 
   if (index === -1) {
     throw new Error(`找不到 ID 為 ${numericId} 的文章`);
@@ -64,7 +87,7 @@ function deletePost(id) {
 
 function printUsage() {
   console.log('用法:');
-  console.log('  node script.js add <title> <content>      新增文章');
+  console.log('  node script.js add <title> <content>      新增文章（預設狀態為 published）');
   console.log('  node script.js delete <id>                刪除文章');
 }
 
