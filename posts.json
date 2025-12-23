@@ -1,1 +1,74 @@
-[]
+[
+  {
+    "id": 1,
+    "title": "自託管寫作：從筆記到公開文章的流程",
+    "excerpt": "整理自託管寫作的最小工作流，從筆記、編輯到發佈，並降低對平台鎖定的依賴。",
+    "content": "從筆記開始蒐集素材，接著在本機以 Markdown 編寫。利用自動化腳本將內容同步至靜態部落格，再透過 CDN 釋出。這條鏈路降低了平台綁定，讓作者能專注在創作本身。",
+    "coverImage": "https://images.unsplash.com/photo-1523475472560-d2df97ec485c?auto=format&fit=crop&w=1200&q=80",
+    "category": "寫作工作流",
+    "tags": ["自託管", "Markdown", "自動化"],
+    "publishedAt": "2024-12-02T08:00:00+08:00",
+    "status": "published",
+    "readingTimeMinutes": 4
+  },
+  {
+    "id": 2,
+    "title": "獨立作者的永續心智：經營節奏與讀者期待",
+    "excerpt": "如何以可持續的節奏經營長期內容，並在不透支創作力的前提下回應讀者。",
+    "content": "獨立作者需要設定明確的創作節奏，避免一次投入過多導致倦怠。透過週期檢視與讀者調查，可以調整題材優先度。當讀者期待與自身動機衝突時，建立透明的更新節奏說明格外重要。",
+    "coverImage": "https://images.unsplash.com/photo-1496104679561-38b3b4d6d97c?auto=format&fit=crop&w=1200&q=80",
+    "category": "創作者經營",
+    "tags": ["永續", "受眾", "節奏"],
+    "publishedAt": "2024-11-18T12:30:00+08:00",
+    "status": "published",
+    "readingTimeMinutes": 5
+  },
+  {
+    "id": 3,
+    "title": "信件式文章：為什麼電子報仍然好用",
+    "excerpt": "電子報像一封給特定讀者的信：它提供一個安靜的空間，讓長內容得以沉澱並被真正閱讀。",
+    "content": "社群演算法的波動使文章曝光變得不穩定，電子報則提供更穩定的直接觸達。透過固定週期與精選連結，作者能建立信任感。同時電子報的回覆機制，也讓交流更接近寫信，而非公開評論。",
+    "coverImage": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80",
+    "category": "電子報",
+    "tags": ["Newsletter", "直達受眾"],
+    "publishedAt": "2024-11-01T09:15:00+08:00",
+    "status": "published",
+    "readingTimeMinutes": 3
+  },
+  {
+    "id": 4,
+    "title": "側寫：社群時代的獨立技術部落格",
+    "excerpt": "採訪兩位以工程實作為主題的作者，聊聊他們如何在社群海流中維持深度。",
+    "content": "訪談中，作者們提到刻意保持刊期穩定與詳盡的案例拆解，避免為了追求流量而犧牲細節。也提到 RSS 與自建郵件列表如何幫助他們留住核心讀者。",
+    "coverImage": "https://images.unsplash.com/photo-1487017159836-4e23ece2e4cf?auto=format&fit=crop&w=1200&q=80",
+    "category": "側寫",
+    "tags": ["工程", "RSS", "深度內容"],
+    "publishedAt": "2024-10-10T15:45:00+08:00",
+    "status": "draft",
+    "readingTimeMinutes": 6
+  },
+  {
+    "id": 5,
+    "title": "閱讀與寫作的雙週複盤模板",
+    "excerpt": "一份可重複使用的複盤表，幫助你整理兩週內的閱讀重點、筆記與待寫題目。",
+    "content": "模板分為閱讀摘要、思考延伸與待寫題目三欄，每欄各自限制字數，促使作者在有限空間內凝練想法。定期複盤能讓靈感庫保持新鮮，也避免題材重複。",
+    "coverImage": "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=1200&q=80",
+    "category": "工具",
+    "tags": ["模板", "複盤", "筆記"],
+    "publishedAt": "2024-09-28T10:05:00+08:00",
+    "status": "published",
+    "readingTimeMinutes": 4
+  },
+  {
+    "id": 6,
+    "title": "離線也能寫：斷網環境下的寫作配置",
+    "excerpt": "在沒有網路的環境，如何維持寫作節奏？本文分享離線工具、備份策略與同步技巧。",
+    "content": "準備離線寫作時，可以先將參考資料儲存為本地快照。使用支援離線的 Markdown 編輯器，並在恢復網路後同步至 Git 儲存庫與雲端硬碟。同時，定期匯出純文字檔以便多端閱讀。",
+    "coverImage": "https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=1200&q=80",
+    "category": "寫作工作流",
+    "tags": ["離線", "備份", "同步"],
+    "publishedAt": "2024-09-05T08:20:00+08:00",
+    "status": "published",
+    "readingTimeMinutes": 3
+  }
+]

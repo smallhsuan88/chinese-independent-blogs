@@ -27,14 +27,32 @@ function nextId(posts) {
   return maxId + 1;
 }
 
+function computeReadingTimeMinutes(content) {
+  const words = content.trim().split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.ceil(words / 200));
+}
+
 function addPost(title, content) {
   const posts = loadPosts();
 
+  const trimmedTitle = title.trim();
+  const trimmedContent = content.trim();
+
+  if (!trimmedTitle || !trimmedContent) {
+    throw new Error('標題與內容都不能為空');
+  }
+
   const post = {
     id: nextId(posts),
-    title,
-    content,
-    createdAt: new Date().toISOString(),
+    title: trimmedTitle,
+    content: trimmedContent,
+    excerpt: trimmedContent.slice(0, 120),
+    category: '未分類',
+    tags: [],
+    coverImage: '',
+    publishedAt: new Date().toISOString(),
+    status: 'published',
+    readingTimeMinutes: computeReadingTimeMinutes(trimmedContent),
   };
 
   posts.push(post);

@@ -12,6 +12,7 @@
       --text: #111111;
       --border: #e0e0e0;
       --accent: #3b82f6;
+      --muted: #6b7280;
     }
     @media (prefers-color-scheme: dark) {
       :root {
@@ -20,6 +21,7 @@
         --text: #e2e8f0;
         --border: #334155;
         --accent: #60a5fa;
+        --muted: #94a3b8;
       }
     }
     body {
@@ -39,13 +41,6 @@
       margin-bottom: 16px;
       letter-spacing: 0.02em;
     }
-    .actions {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-    }
     button {
       background: var(--accent);
       color: #fff;
@@ -64,48 +59,28 @@
       transform: translateY(0);
       box-shadow: none;
     }
-    form {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 20px;
-      display: none;
-    }
-    form.visible {
-      display: block;
-    }
-    label {
-      display: block;
-      margin-bottom: 4px;
-      font-weight: 600;
-    }
-    input[type="text"],
-    textarea {
-      width: 100%;
-      box-sizing: border-box;
-      padding: 10px 12px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      font-size: 15px;
-      background: var(--bg);
-      color: var(--text);
-      margin-bottom: 12px;
-    }
-    textarea {
-      resize: vertical;
-      min-height: 120px;
-    }
     .posts {
       display: grid;
-      gap: 16px;
+      gap: 20px;
     }
     .post {
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 16px;
+      overflow: hidden;
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
+    }
+    .post-media {
+      width: 100%;
+      aspect-ratio: 3 / 1.4;
+      object-fit: cover;
+      display: block;
+      background: #e5e7eb;
+    }
+    .post-body {
+      padding: 16px;
+      display: grid;
+      gap: 8px;
     }
     .post header {
       display: flex;
@@ -121,148 +96,200 @@
     }
     .meta {
       font-size: 13px;
-      color: #6b7280;
+      color: var(--muted);
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .badge {
+      display: inline-flex;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(59, 130, 246, 0.1);
+      color: var(--accent);
+      font-weight: 600;
+      font-size: 12px;
+      letter-spacing: 0.02em;
+    }
+    .tags {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+    .tags .badge {
+      background: rgba(148, 163, 184, 0.18);
+      color: var(--muted);
+      font-weight: 500;
+    }
+    .excerpt {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
     }
     .empty {
       text-align: center;
-      color: #6b7280;
+      color: var(--muted);
       font-size: 15px;
       padding: 32px 0;
     }
-    .danger {
-      background: #dc2626;
+    .pagination {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 24px;
+      align-items: center;
+      flex-wrap: wrap;
+      color: var(--muted);
+    }
+    .pagination button {
+      background: var(--card);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+    .pagination button[disabled] {
+      opacity: 0.5;
+      cursor: not-allowed;
     }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>極簡部落格</h1>
-    <div class="actions">
-      <button id="toggleForm">＋ 新增文章</button>
-    </div>
-
-    <form id="postForm">
-      <div>
-        <label for="title">文章標題</label>
-        <input id="title" name="title" type="text" placeholder="請輸入標題" required>
-      </div>
-      <div>
-        <label for="content">文章內容</label>
-        <textarea id="content" name="content" placeholder="請輸入內容" required></textarea>
-      </div>
-      <button type="submit">儲存文章</button>
-    </form>
-
+    <p class="meta">只列出已發佈的文章，包含封面、分類、標籤與預估閱讀時間。</p>
     <section id="postList" class="posts"></section>
+    <div id="pagination" class="pagination"></div>
   </div>
 
   <script>
-    const storageKey = 'blogPosts';
+    const PAGE_SIZE = 3;
     const postList = document.getElementById('postList');
-    const postForm = document.getElementById('postForm');
-    const toggleFormBtn = document.getElementById('toggleForm');
-    const titleInput = document.getElementById('title');
-    const contentInput = document.getElementById('content');
+    const pagination = document.getElementById('pagination');
+    let allPosts = [];
+    let currentPage = 1;
 
-    function loadPosts() {
-      const raw = localStorage.getItem(storageKey);
-      if (!raw) return [];
-      try {
-        const parsed = JSON.parse(raw);
-        return Array.isArray(parsed) ? parsed : [];
-      } catch {
-        return [];
-      }
+    function formatDate(isoString) {
+      const date = new Date(isoString);
+      if (Number.isNaN(date.getTime())) return '未知日期';
+      return date.toLocaleDateString('zh-TW', { year: 'numeric', month: '2-digit', day: '2-digit' });
     }
 
-    function savePosts(posts) {
-      localStorage.setItem(storageKey, JSON.stringify(posts));
+    function computeReadingTimeMinutes(content) {
+      const words = content.trim().split(/\s+/).filter(Boolean).length;
+      return Math.max(1, Math.ceil(words / 200));
     }
 
-    function nextId(posts) {
-      return posts.reduce((max, post) => Math.max(max, post.id || 0), 0) + 1;
+    function renderPagination() {
+      pagination.innerHTML = '';
+      const totalPages = Math.ceil(allPosts.length / PAGE_SIZE) || 1;
+
+      const info = document.createElement('span');
+      info.textContent = `第 ${currentPage} / ${totalPages} 頁`;
+
+      const prev = document.createElement('button');
+      prev.textContent = '上一頁';
+      prev.disabled = currentPage === 1;
+      prev.onclick = () => {
+        currentPage = Math.max(1, currentPage - 1);
+        renderPosts();
+      };
+
+      const next = document.createElement('button');
+      next.textContent = '下一頁';
+      next.disabled = currentPage === totalPages;
+      next.onclick = () => {
+        currentPage = Math.min(totalPages, currentPage + 1);
+        renderPosts();
+      };
+
+      pagination.append(prev, info, next);
     }
 
     function renderPosts() {
-      const posts = loadPosts();
       postList.innerHTML = '';
 
-      if (posts.length === 0) {
-        postList.innerHTML = '<div class="empty">目前沒有文章，點擊「新增文章」開始撰寫。</div>';
+      if (allPosts.length === 0) {
+        postList.innerHTML = '<div class="empty">目前沒有發佈的文章。</div>';
+        pagination.innerHTML = '';
         return;
       }
 
-      posts
-        .sort((a, b) => b.id - a.id)
-        .forEach((post) => {
-          const wrapper = document.createElement('article');
-          wrapper.className = 'post';
+      const start = (currentPage - 1) * PAGE_SIZE;
+      const slice = allPosts.slice(start, start + PAGE_SIZE);
 
-          const header = document.createElement('header');
-          const title = document.createElement('h2');
-          title.textContent = post.title;
+      slice.forEach((post) => {
+        const wrapper = document.createElement('article');
+        wrapper.className = 'post';
 
-          const meta = document.createElement('div');
-          meta.className = 'meta';
-          meta.textContent = `#${post.id} · 建立於 ${post.createdAt}`;
+        if (post.coverImage) {
+          const img = document.createElement('img');
+          img.className = 'post-media';
+          img.src = post.coverImage;
+          img.alt = `${post.title} 封面`;
+          wrapper.appendChild(img);
+        }
 
-          const deleteBtn = document.createElement('button');
-          deleteBtn.textContent = '刪除';
-          deleteBtn.className = 'danger';
-          deleteBtn.onclick = () => deletePost(post.id);
+        const body = document.createElement('div');
+        body.className = 'post-body';
 
-          header.append(title, deleteBtn);
+        const header = document.createElement('header');
+        const title = document.createElement('h2');
+        title.textContent = post.title;
+        header.append(title);
 
-          const content = document.createElement('p');
-          content.textContent = post.content;
+        const meta = document.createElement('div');
+        meta.className = 'meta';
+        const date = formatDate(post.publishedAt || post.createdAt);
+        const readingTime = post.readingTimeMinutes || computeReadingTimeMinutes(post.content || '');
+        meta.textContent = `${date} · ${readingTime} 分鐘閱讀`;
 
-          wrapper.append(header, meta, content);
-          postList.appendChild(wrapper);
+        const category = document.createElement('span');
+        category.className = 'badge';
+        category.textContent = post.category || '未分類';
+
+        const excerpt = document.createElement('p');
+        excerpt.className = 'excerpt';
+        excerpt.textContent = post.excerpt || (post.content || '').slice(0, 120);
+
+        const tags = document.createElement('div');
+        tags.className = 'tags';
+        (post.tags || []).forEach((tag) => {
+          const badge = document.createElement('span');
+          badge.className = 'badge';
+          badge.textContent = tag;
+          tags.appendChild(badge);
         });
+
+        body.append(header, meta, category, excerpt);
+        if (tags.childElementCount) {
+          body.appendChild(tags);
+        }
+        wrapper.appendChild(body);
+        postList.appendChild(wrapper);
+      });
+
+      renderPagination();
     }
 
-    function addPost(title, content) {
-      const posts = loadPosts();
-      const post = {
-        id: nextId(posts),
-        title: title.trim(),
-        content: content.trim(),
-        createdAt: new Date().toLocaleString('zh-TW'),
-      };
-      posts.push(post);
-      savePosts(posts);
-      renderPosts();
-    }
-
-    function deletePost(id) {
-      const posts = loadPosts().filter((post) => post.id !== id);
-      savePosts(posts);
-      renderPosts();
-    }
-
-    toggleFormBtn.addEventListener('click', () => {
-      postForm.classList.toggle('visible');
-      if (postForm.classList.contains('visible')) {
-        titleInput.focus();
+    async function fetchPosts() {
+      try {
+        const response = await fetch('posts.json', { cache: 'no-store' });
+        const data = await response.json();
+        if (!Array.isArray(data)) throw new Error('posts.json 內容格式錯誤');
+        allPosts = data
+          .filter((post) => post.status === 'published')
+          .sort((a, b) => new Date(b.publishedAt || b.createdAt || 0) - new Date(a.publishedAt || a.createdAt || 0));
+        currentPage = 1;
+        renderPosts();
+      } catch (error) {
+        postList.innerHTML = `<div class=\"empty\">載入文章列表時發生錯誤：${error.message}</div>`;
       }
-    });
+    }
 
-    postForm.addEventListener('submit', (event) => {
-      event.preventDefault();
-      const title = titleInput.value;
-      const content = contentInput.value;
-
-      if (!title.trim() || !content.trim()) {
-        alert('請輸入完整的標題與內容');
-        return;
-      }
-
-      addPost(title, content);
-      postForm.reset();
-      postForm.classList.remove('visible');
-    });
-
-    renderPosts();
+    fetchPosts();
   </script>
 </body>
 </html>
