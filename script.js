@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const { randomUUID } = require('crypto');
 
 const dataFile = path.join(__dirname, 'posts.json');
 const DEFAULT_CATEGORY = '未分類';
@@ -16,7 +17,13 @@ function loadPosts() {
     throw new Error('posts.json 應該是一個包含文章的陣列');
   }
 
-  return parsed;
+  const normalized = normalizePosts(parsed);
+
+  if (JSON.stringify(parsed) !== JSON.stringify(normalized)) {
+    savePosts(normalized);
+  }
+
+  return normalized;
 }
 
 function savePosts(posts) {
@@ -34,6 +41,68 @@ function generateExcerpt(content) {
   return slice + (trimmed.length > 120 ? '…' : '');
 }
 
+function slugify(text) {
+  return (text || '')
+    .normalize('NFKD')
+    .replace(/\p{Diacritic}/gu, '')
+    .replace(/[^\w\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-')
+    .toLowerCase() || 'untitled';
+}
+
+function buildSlugSet(posts) {
+  return new Map(
+    posts.map((post) => {
+      const slug = post.slug || '';
+      return [slug, post.id];
+    }),
+  );
+}
+
+function ensureUniqueSlug(slug, mapOrPosts, currentId) {
+  const slugMap = mapOrPosts instanceof Map ? mapOrPosts : buildSlugSet(mapOrPosts || []);
+  const base = slug || 'untitled';
+  let candidate = base;
+  let counter = 2;
+
+  while (slugMap.has(candidate) && slugMap.get(candidate) !== currentId) {
+    candidate = `${base}-${counter}`;
+    counter += 1;
+  }
+
+  slugMap.set(candidate, currentId || true);
+  return candidate;
+}
+
+function normalizePosts(posts) {
+  const slugMap = new Map();
+  const baseId = posts.reduce((max, post) => Math.max(max, Number(post.id) || 0), 0);
+  let tempCounter = 1;
+  return posts.map((post, index) => {
+    const status = post.status === 'draft' ? 'draft' : 'published';
+    const title = post.title || `未命名文章 ${index + 1}`;
+    const rawSlug = post.slug || slugify(title);
+    const baseSlug = ensureUniqueSlug(rawSlug, slugMap, post.id);
+    const id = post.id ?? baseId + tempCounter++;
+
+    return {
+      id,
+      title,
+      content: post.content || '',
+      excerpt: post.excerpt || generateExcerpt(post.content || ''),
+      coverImage: post.coverImage || '',
+      category: post.category || DEFAULT_CATEGORY,
+      tags: parseTags(post.tags),
+      slug: baseSlug,
+      status,
+      createdAt: post.createdAt || new Date().toISOString(),
+      publishedAt: status === 'draft' ? null : post.publishedAt || post.createdAt || new Date().toISOString(),
+      previewToken: post.previewToken || randomUUID(),
+    };
+  });
+}
+
 function parseTags(raw) {
   if (!raw) return [];
   if (Array.isArray(raw)) return raw;
@@ -47,6 +116,8 @@ function addPost(title, content, options = {}) {
   const posts = loadPosts();
 
   const now = new Date().toISOString();
+  const slug = ensureUniqueSlug(options.slug || slugify(title), posts);
+
   const post = {
     id: nextId(posts),
     title,
@@ -56,8 +127,10 @@ function addPost(title, content, options = {}) {
     category: options.category || DEFAULT_CATEGORY,
     tags: parseTags(options.tags),
     status: options.status === 'draft' ? 'draft' : 'published',
+    slug,
     createdAt: now,
     publishedAt: options.status === 'draft' ? null : options.publishedAt || now,
+    previewToken: options.previewToken || randomUUID(),
   };
 
   posts.push(post);

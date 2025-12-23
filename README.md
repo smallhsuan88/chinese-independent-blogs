@@ -1,19 +1,17 @@
 # 極簡部落格
 
-文章列表頁展示 published 文章，包含標題、摘要、封面圖（可選）、分類、標籤、發佈日期與估算閱讀時間，並提供分頁與新增/刪除功能。
+提供極簡但完整的部落格體驗：文章列表（僅 published）、全文搜尋、分類/標籤瀏覽、Markdown 內頁、上一篇/下一篇、相關文章、私密預覽草稿與最小可用 CMS。
 
 ## 圖形介面使用方式
 
-1. 直接開啟 `index.html`（雙擊或用瀏覽器開啟）。若用本機伺服器開啟，會嘗試讀取 `posts.json` 內容並同步到 localStorage。
-2. 按下「新增文章」後填寫：
-   - 標題、內容（必填）
-   - 摘要（可留空，未填會自動截取內容開頭）
-   - 分類、標籤（逗號分隔）、封面圖 URL（可空）
-   - 文章狀態（published/draft）、發佈日期（預設今日，僅 published 會出現在列表）
-3. 點擊儲存後，列表僅會顯示狀態為 published 的文章，並顯示估算閱讀時間。
-4. 列表底部可切換分頁；刪除按鈕可移除指定文章。
+1. 開啟 `index.html`（可直接以檔案或本機伺服器打開）。首次會同步 `posts.json` 至瀏覽器 localStorage。
+2. 點擊「新增 / 編輯」展開表單，可填寫：title、slug（可編）、excerpt、content(Markdown)、cover_image_url、category、tags、status（published/draft）、published_at。
+3. 列表只顯示 published 文章，含封面、摘要、分類、標籤、發佈日期與估算閱讀時間，並支援分頁。
+4. 內頁使用 slug（例：`#/blog/does-name-affect-life`）渲染 Markdown（含 code block、引用、圖片、表格），自動產生 TOC、上一篇/下一篇與相關文章（分類或標籤）。
+5. 分類/標籤頁：`#/category/:slug`、`#/tag/:slug`。搜尋頁：`#/search?q=keyword`（搜尋標題/摘要/內容）。
+6. 後台管理列出全部文章（含 draft），可編輯/刪除並取得草稿私密預覽連結（`#/blog/:slug?preview=token`），並可編輯「關於、聯絡、隱私權政策、免責聲明」四個靜態頁面。
 
-> 文章資料會存放在瀏覽器的 localStorage（僅本機可見）。
+> 文章資料僅存放於瀏覽器 localStorage（本機）。
 
 ## 命令列使用方式
 
@@ -21,7 +19,7 @@
    ```bash
    npm install
    ```
-2. 新增文章（預設狀態為 published，摘要自動截取）
+2. 新增文章（預設狀態為 published，slug 依標題自動產生，摘要自動截取）
    ```bash
    node script.js add "文章標題" "文章內容"
    ```
@@ -30,4 +28,4 @@
    node script.js delete <id>
    ```
 
-每篇文章都會自動取得遞增的 `id`、建立時間，並在 UI 中顯示發佈日期與閱讀時間估算。
+每篇文章都會自動取得遞增的 `id` 與建立時間，published 文章會有發佈日期，draft 文章提供私密預覽 token。
