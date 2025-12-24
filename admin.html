@@ -3,214 +3,202 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>作者後台</title>
+  <title>作者後台入口</title>
   <style>
-    body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans TC","Microsoft JhengHei",sans-serif; margin:24px; max-width:900px;}
-    input,button,textarea{font-size:16px; padding:10px; margin:6px 0;}
-    textarea{width:100%; height:120px;}
-    .row{display:flex; gap:10px; align-items:center; flex-wrap:wrap;}
-    .card{border:1px solid #ddd; border-radius:10px; padding:12px; margin:10px 0;}
-    .muted{color:#666;}
-    .danger{color:#b00020;}
-    .ok{color:#0b7a0b;}
+    :root {
+      color-scheme: light dark;
+      --bg: #f7f9fc;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #475569;
+      --border: #e2e8f0;
+      --accent: #2563eb;
+      --accent-soft: #e9f0ff;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0b1222;
+        --card: #0f172a;
+        --text: #e2e8f0;
+        --muted: #94a3b8;
+        --border: #1f2a3d;
+        --accent: #60a5fa;
+        --accent-soft: #0d1c37;
+      }
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .card {
+      width: min(520px, 100%);
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 24px;
+      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12);
+    }
+
+    h1 { margin: 0 0 8px; }
+
+    p { margin: 0 0 16px; color: var(--muted); line-height: 1.7; }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: color-mix(in srgb, var(--card) 96%, transparent);
+      font-size: 15px;
+      color: var(--text);
+    }
+
+    button {
+      margin-top: 12px;
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 12px;
+      font-weight: 800;
+      font-size: 15px;
+      cursor: pointer;
+      background: linear-gradient(120deg, #2563eb, #1d4ed8);
+      color: #fff;
+      box-shadow: 0 10px 22px rgba(37, 99, 235, 0.25);
+      transition: transform 0.08s ease, box-shadow 0.18s ease;
+    }
+
+    button:hover { transform: translateY(-1px); box-shadow: 0 12px 26px rgba(37, 99, 235, 0.28); }
+    button:active { transform: translateY(0); box-shadow: none; }
+
+    .status {
+      margin-top: 12px;
+      font-size: 14px;
+      color: var(--muted);
+      word-break: break-all;
+    }
+
+    .user-box {
+      margin-top: 16px;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px dashed var(--border);
+      background: var(--accent-soft);
+      color: var(--text);
+      line-height: 1.6;
+    }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-  <h1>作者後台</h1>
+  <div class="card">
+    <h1>作者後台入口</h1>
+    <p>請登入後管理文章。此頁僅做登入入口與狀態確認，後續草稿與發布功能將於下一階段補齊。</p>
 
-  <div id="status" class="muted">初始化中…</div>
+    <label for="email">登入信箱（Magic Link）</label>
+    <input id="email" type="email" placeholder="you@example.com" autocomplete="email" />
 
-  <div id="authBox" class="card">
-    <h3>登入（Email Magic Link）</h3>
-    <input id="email" placeholder="you@example.com" style="width:320px;" />
-    <div class="row">
-      <button id="btnLogin">寄送登入連結</button>
-      <button id="btnLogout" style="display:none;">登出</button>
-    </div>
-    <div class="muted">提示：信件可能在垃圾郵件。</div>
-  </div>
+    <button id="btnAuth">登入 / 登出</button>
+    <div id="status" class="status">初始化中…</div>
 
-  <div id="app" style="display:none;">
-    <div class="card">
-      <h3>新增草稿</h3>
-      <input id="newTitle" placeholder="標題" style="width:100%;" />
-      <input id="newSlug" placeholder="slug（例如 my-post-20251224）" style="width:100%;" />
-      <textarea id="newContent" placeholder="內容（可先隨便）"></textarea>
-      <button id="btnCreateDraft">建立 draft</button>
-      <div id="createMsg" class="muted"></div>
-    </div>
-
-    <h3>我的文章</h3>
-    <div id="list"></div>
+    <div id="userBox" class="user-box" style="display:none;"></div>
   </div>
 
   <script>
-    // 1) 換成你的
     const SUPABASE_URL = "https://kxilbdbtzoscutxjzbss.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt4aWxiZGJ0em9zY3V0eGp6YnNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY1MTQzMzgsImV4cCI6MjA4MjA5MDMzOH0.xWhjqKF9DeqY3t3RJaU4FoL1LRRkxgYkZ34L9fgFh8g";
 
-    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const { createClient } = supabase;
+    const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const $ = (id) => document.getElementById(id);
-    const statusEl = $("status");
-    const authBox = $("authBox");
-    const appEl = $("app");
-    const btnLogin = $("btnLogin");
-    const btnLogout = $("btnLogout");
-    const listEl = $("list");
+    const statusEl = document.getElementById("status");
+    const btnAuth = document.getElementById("btnAuth");
+    const emailInput = document.getElementById("email");
+    const userBox = document.getElementById("userBox");
 
-    function setStatus(msg, cls="muted"){
-      statusEl.className = cls;
+    function setStatus(msg) {
       statusEl.textContent = msg;
     }
 
-    async function refreshMeAndList(){
-      const { data: { user } } = await sb.auth.getUser();
-      if(!user){
-        appEl.style.display = "none";
-        btnLogout.style.display = "none";
-        setStatus("尚未登入（只能看公開 blog）", "muted");
+    async function refreshSession() {
+      const { data, error } = await sb.auth.getUser();
+      if (error) {
+        setStatus("讀取登入狀態失敗：" + error.message);
+        userBox.style.display = "none";
+        btnAuth.textContent = "重新登入";
         return;
       }
 
-      btnLogout.style.display = "inline-block";
-      appEl.style.display = "block";
-      setStatus(`已登入：${user.email}（uid: ${user.id}）`, "ok");
-
-      // 2) 讀自己的文章（draft/published 都會回來，前提：你有加 SELECT policy: author_id = auth.uid()）
-      const { data, error } = await sb
-        .from("posts")
-        .select("id,title,slug,status,published_at,created_at")
-        .order("created_at", { ascending: false });
-
-      if(error){
-        listEl.innerHTML = `<div class="danger">讀取失敗：${error.message}</div>`;
+      const user = data?.user;
+      if (!user) {
+        setStatus("尚未登入，請輸入 email 取得登入連結。");
+        userBox.style.display = "none";
+        btnAuth.textContent = "寄送登入連結";
         return;
       }
 
-      if(!data || data.length === 0){
-        listEl.innerHTML = `<div class="muted">目前沒有文章</div>`;
-        return;
-      }
-
-      listEl.innerHTML = data.map(p => `
-        <div class="card">
-          <div><b>${escapeHtml(p.title || "(無標題)")}</b></div>
-          <div class="muted">slug: ${escapeHtml(p.slug || "")}</div>
-          <div class="row">
-            <div>狀態：<b>${p.status}</b></div>
-            <div class="muted">published_at：${p.published_at || "-"}</div>
-          </div>
-          <div class="row">
-            <button onclick="publishPost('${p.id}')">發布</button>
-            <button onclick="toDraft('${p.id}')">改回草稿</button>
-            <button onclick="deletePost('${p.id}')" class="danger">刪除</button>
-          </div>
-        </div>
-      `).join("");
+      setStatus("已登入，可前往後台管理文章。");
+      btnAuth.textContent = "登出";
+      userBox.style.display = "block";
+      userBox.innerHTML = `
+        <div><strong>目前使用者：</strong>${user.email || "(無 email)"}</div>
+        <div><strong>UID：</strong>${user.id}</div>
+      `;
     }
 
-    function escapeHtml(s){
-      return String(s).replace(/[&<>"']/g, c => ({
-        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-      }[c]));
-    }
+    btnAuth.addEventListener("click", async () => {
+      const { data } = await sb.auth.getUser();
+      const user = data?.user;
 
-    // 3) 登入：寄 magic link
-    btnLogin.onclick = async () => {
-      const email = $("email").value.trim();
-      if(!email) return setStatus("請輸入 email", "danger");
+      if (user) {
+        await sb.auth.signOut();
+        setStatus("已登出。");
+        await refreshSession();
+        return;
+      }
 
-      setStatus("寄送登入連結中…", "muted");
+      const email = emailInput.value.trim();
+      if (!email) {
+        setStatus("請輸入 email 後再送出。");
+        return;
+      }
+
+      setStatus("寄送登入連結中…");
       const { error } = await sb.auth.signInWithOtp({
         email,
         options: {
-          // 讓 magic link 回到你的 admin.html（避免跳回首頁）
           emailRedirectTo: location.origin + location.pathname.replace(/\/[^\/]*$/, "/") + "admin.html"
         }
       });
 
-      if(error) setStatus("寄送失敗：" + error.message, "danger");
-      else setStatus("已寄出登入連結，請去收信點擊登入。", "ok");
-    };
-
-    btnLogout.onclick = async () => {
-      await sb.auth.signOut();
-      await refreshMeAndList();
-    };
-
-    // 4) 建立草稿
-    $("btnCreateDraft").onclick = async () => {
-      const title = $("newTitle").value.trim();
-      const slug  = $("newSlug").value.trim();
-      const content = $("newContent").value.trim();
-
-      if(!slug){
-        $("createMsg").textContent = "slug 必填（且不能重複）";
-        return;
+      if (error) {
+        setStatus("寄送失敗：" + error.message);
+      } else {
+        setStatus("已寄出登入連結，請到信箱點擊登入。");
       }
+    });
 
-      $("createMsg").textContent = "建立中…";
-
-      const { data: { user } } = await sb.auth.getUser();
-      if(!user){
-        $("createMsg").textContent = "你尚未登入";
-        return;
-      }
-
-      const { error } = await sb.from("posts").insert({
-        title,
-        slug,
-        content,
-        status: "draft",
-        published_at: null,
-        author_id: user.id
-      });
-
-      if(error) $("createMsg").textContent = "建立失敗：" + error.message;
-      else {
-        $("createMsg").textContent = "建立成功";
-        $("newTitle").value = "";
-        $("newSlug").value = "";
-        $("newContent").value = "";
-        await refreshMeAndList();
-      }
-    };
-
-    // 5) 發布流程（draft -> published）
-    window.publishPost = async (id) => {
-      const { error } = await sb.from("posts").update({
-        status: "published",
-        published_at: new Date().toISOString()
-      }).eq("id", id);
-
-      if(error) alert("發布失敗：" + error.message);
-      await refreshMeAndList();
-    };
-
-    // 6) 退回草稿（published -> draft）
-    window.toDraft = async (id) => {
-      const { error } = await sb.from("posts").update({
-        status: "draft",
-        published_at: null
-      }).eq("id", id);
-
-      if(error) alert("更新失敗：" + error.message);
-      await refreshMeAndList();
-    };
-
-    // 7) 刪除（只能刪自己的：靠 RLS）
-    window.deletePost = async (id) => {
-      if(!confirm("確定刪除？")) return;
-      const { error } = await sb.from("posts").delete().eq("id", id);
-      if(error) alert("刪除失敗：" + error.message);
-      await refreshMeAndList();
-    };
-
-    // init
-    sb.auth.onAuthStateChange(() => refreshMeAndList());
-    refreshMeAndList();
+    sb.auth.onAuthStateChange(() => refreshSession());
+    refreshSession();
   </script>
 </body>
 </html>

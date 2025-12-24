@@ -3,1538 +3,175 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>極簡部落格</title>
+  <title>中文獨立部落格｜首頁</title>
   <style>
     :root {
       color-scheme: light dark;
-      --bg: #f6f7fb;
+      --bg: #f5f7fb;
       --card: #ffffff;
-      --text: #111827;
-      --muted: #6b7280;
-      --border: #e5e7eb;
+      --text: #0f172a;
+      --muted: #475569;
+      --border: #e2e8f0;
       --accent: #2563eb;
-      --accent-soft: #eff6ff;
-      --danger: #dc2626;
-      --tag: #f3f4f6;
-      --success: #16a34a;
-      --warning: #d97706;
+      --accent-soft: #e9f0ff;
     }
 
     @media (prefers-color-scheme: dark) {
       :root {
-        --bg: #0f172a;
-        --card: #0b1222;
+        --bg: #0b1222;
+        --card: #0f172a;
         --text: #e2e8f0;
         --muted: #94a3b8;
-        --border: #1e293b;
+        --border: #1f2a3d;
         --accent: #60a5fa;
-        --accent-soft: #0b1b38;
-        --danger: #f87171;
-        --tag: #1f2937;
-        --success: #22c55e;
-        --warning: #fbbf24;
+        --accent-soft: #0d1c37;
       }
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
       font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, -apple-system, sans-serif;
-      background: radial-gradient(circle at 10% 20%, rgba(37, 99, 235, 0.08), transparent 20%),
-        radial-gradient(circle at 90% 10%, rgba(16, 185, 129, 0.08), transparent 18%),
-        var(--bg);
+      background: radial-gradient(circle at 12% 18%, rgba(37, 99, 235, 0.08), transparent 26%),
+                  radial-gradient(circle at 88% 12%, rgba(16, 185, 129, 0.08), transparent 22%),
+                  var(--bg);
       color: var(--text);
       min-height: 100vh;
-    }
-
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
-
-    .topbar {
-      position: sticky;
-      top: 0;
-      z-index: 10;
-      backdrop-filter: blur(10px);
-      background: color-mix(in srgb, var(--bg) 90%, transparent);
-      border-bottom: 1px solid var(--border);
-      padding: 12px 16px;
       display: flex;
       align-items: center;
-      gap: 14px;
+      justify-content: center;
+      padding: 24px 16px;
     }
 
-    .topbar .brand {
-      font-weight: 800;
-      letter-spacing: 0.02em;
-      font-size: 18px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+    a { color: inherit; text-decoration: none; }
 
-    .nav-links {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-
-    .nav-links a {
-      padding: 8px 12px;
-      border-radius: 10px;
-      color: var(--muted);
-      font-weight: 600;
-    }
-
-    .nav-links a.active,
-    .nav-links a:hover {
-      background: var(--accent-soft);
-      color: var(--accent);
-    }
-
-    .topbar-right {
-      margin-left: auto;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .search-box {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--card);
-      border: 1px solid var(--border);
-      padding: 6px 10px;
-      border-radius: 12px;
-    }
-
-    .search-box input {
-      border: none;
-      outline: none;
-      background: transparent;
-      color: var(--text);
-      min-width: 160px;
-    }
-
-    .container {
-      width: min(1080px, 100%);
-      margin: 0 auto;
-      padding: 20px 16px 96px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
+    .shell { width: min(960px, 100%); }
 
     .hero {
       background: var(--card);
       border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 18px;
-      box-shadow: 0 12px 24px rgba(15, 23, 42, 0.06);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
+      border-radius: 20px;
+      padding: 32px;
+      box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08);
     }
 
-    .hero h1 {
-      margin: 0 0 6px;
-      font-size: clamp(26px, 3vw, 32px);
-      letter-spacing: 0.01em;
-    }
-
-    .hero p {
-      margin: 0;
+    .eyebrow {
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-weight: 700;
+      font-size: 12px;
+      margin: 0 0 10px;
       color: var(--muted);
-      line-height: 1.6;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(30px, 4vw, 40px);
+    }
+
+    .subtitle {
+      margin: 0 0 24px;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 16px;
       max-width: 720px;
     }
 
-    button {
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      border-radius: 12px;
-      padding: 10px 14px;
-      font-size: 14px;
-      cursor: pointer;
-      transition: transform 0.05s ease, box-shadow 0.15s ease, opacity 0.15s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-weight: 700;
-    }
-
-    button:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 8px 18px rgba(37, 99, 235, 0.18);
-    }
-
-    button:active {
-      transform: translateY(0);
-      box-shadow: none;
-      opacity: 0.9;
-    }
-
-    button.secondary {
-      background: var(--tag);
-      color: var(--text);
-      box-shadow: inset 0 0 0 1px var(--border);
-    }
-
-    button.danger {
-      background: var(--danger);
-      box-shadow: none;
-    }
-
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 16px;
-      box-shadow: 0 12px 24px rgba(15, 23, 42, 0.06);
-    }
-
-    form {
-      display: none;
-    }
-
-    form.visible {
-      display: block;
-    }
-
-    form.static-form {
-      display: block;
-      margin-top: 12px;
-    }
-
-    form .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 12px 16px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 4px;
-      font-weight: 700;
-      font-size: 14px;
-    }
-
-    input[type="text"],
-    input[type="date"],
-    textarea,
-    select {
-      width: 100%;
-      box-sizing: border-box;
-      padding: 10px 12px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      font-size: 14px;
-      background: var(--bg);
-      color: var(--text);
-      margin-bottom: 10px;
-    }
-
-    textarea {
-      resize: vertical;
-      min-height: 120px;
-    }
-
-    .view-header {
+    .actions {
       display: flex;
-      justify-content: space-between;
+      gap: 12px;
       align-items: center;
       flex-wrap: wrap;
-      gap: 12px;
+      margin-bottom: 26px;
     }
 
-    .view-title {
-      margin: 0;
-      font-size: 22px;
-    }
-
-    .meta {
-      font-size: 13px;
-      color: var(--muted);
-    }
-
-    .posts {
-      display: grid;
-      gap: 16px;
-      margin-top: 12px;
-    }
-
-    .post {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 16px;
-      box-shadow: 0 10px 26px rgba(15, 23, 42, 0.06);
-      display: grid;
-      gap: 12px;
-      cursor: pointer;
-    }
-
-    .post header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 12px;
-    }
-
-    .post h2 {
-      margin: 0;
-      font-size: 20px;
-      line-height: 1.3;
-    }
-
-    .cover {
-      width: 100%;
+    .cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(120deg, #2563eb, #1d4ed8);
+      color: #fff;
+      padding: 12px 18px;
       border-radius: 12px;
-      height: 200px;
-      object-fit: cover;
-      border: 1px solid var(--border);
-      background: var(--tag);
+      font-weight: 800;
+      box-shadow: 0 12px 20px rgba(37, 99, 235, 0.24);
+      transition: transform 0.08s ease, box-shadow 0.18s ease;
     }
 
-    .badge {
+    .cta:hover { transform: translateY(-2px); box-shadow: 0 14px 28px rgba(37, 99, 235, 0.28); }
+    .cta:active { transform: translateY(0); box-shadow: none; }
+
+    .pill {
       display: inline-flex;
       align-items: center;
       gap: 6px;
+      padding: 8px 12px;
+      border-radius: 999px;
       background: var(--accent-soft);
       color: var(--accent);
-      padding: 6px 10px;
-      border-radius: 999px;
       font-weight: 700;
-      font-size: 12px;
-      letter-spacing: 0.02em;
-      border: 1px solid var(--border);
-      white-space: nowrap;
-    }
-
-    .post-meta {
       font-size: 13px;
-      color: var(--muted);
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      flex-wrap: wrap;
     }
 
-    .tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .tag {
-      background: var(--tag);
-      color: var(--text);
-      padding: 6px 10px;
-      border-radius: 999px;
-      font-size: 12px;
-      border: 1px solid var(--border);
-      cursor: pointer;
-    }
-
-    .empty {
-      text-align: center;
-      color: var(--muted);
-      font-size: 15px;
-      padding: 32px 0;
-      border: 1px dashed var(--border);
-      border-radius: 14px;
-      background: rgba(255, 255, 255, 0.4);
-    }
-
-    .pagination {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    .reading-time {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      background: var(--tag);
-      padding: 6px 10px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      font-size: 12px;
-    }
-
-    .status {
-      padding: 6px 10px;
-      border-radius: 10px;
-      font-size: 12px;
-      font-weight: 700;
-      background: var(--tag);
-      border: 1px solid var(--border);
-      color: var(--text);
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .status.published {
-      color: var(--success);
-      border-color: color-mix(in srgb, var(--success) 30%, var(--border));
-    }
-
-    .status.draft {
-      color: var(--warning);
-      border-color: color-mix(in srgb, var(--warning) 30%, var(--border));
-    }
-
-    .view {
-      display: none;
-    }
-
-    .view.visible {
-      display: block;
-    }
-
-    .article-body {
-      margin-top: 8px;
-      line-height: 1.8;
-    }
-
-    .article-body img {
-      max-width: 100%;
-      border-radius: 12px;
-    }
-
-    .toc {
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 12px;
-      background: var(--card);
-    }
-
-    .toc h3 {
-      margin-top: 0;
-    }
-
-    .toc ul {
+    .list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
       margin: 0;
-      padding-left: 18px;
+      padding: 0;
       list-style: none;
     }
 
-    .toc li {
-      margin-bottom: 6px;
+    .list li {
+      background: color-mix(in srgb, var(--card) 90%, transparent);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
       color: var(--muted);
-    }
-
-    .article-meta {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items: center;
-      color: var(--muted);
-      font-size: 14px;
-    }
-
-    .article-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 16px;
-    }
-
-    .grid-2 {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 16px;
-      align-items: start;
+      line-height: 1.6;
+      font-weight: 600;
     }
 
     footer {
-      border-top: 1px solid var(--border);
-      padding: 16px;
-      background: var(--card);
+      margin-top: 18px;
+      text-align: right;
       color: var(--muted);
-      display: grid;
-      gap: 8px;
-    }
-
-    .footer-links {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    .mono {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      font-size: 13px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 10px;
-      white-space: pre-wrap;
-    }
-
-    .notice {
-      background: var(--accent-soft);
-      color: var(--accent);
-      padding: 10px 12px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
       font-size: 13px;
     }
 
-    .chip {
-      background: var(--tag);
-      padding: 6px 10px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 12px;
+    .admin-link {
+      color: var(--muted);
+      opacity: 0.7;
     }
 
-    @media (max-width: 640px) {
-      .topbar {
-        flex-wrap: wrap;
-      }
-
-      .topbar-right {
-        width: 100%;
-        justify-content: space-between;
-      }
-
-      .search-box input {
-        min-width: 0;
-        width: 100%;
-      }
-
-      .article-meta {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-    }
+    .admin-link:hover { opacity: 1; text-decoration: underline; }
   </style>
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <body>
-  <header class="topbar">
-    <div class="brand">極簡部落格</div>
-    <nav class="nav-links">
-      <a href="#/blog" data-nav="blog" class="active">Blog</a>
-      <a href="#/page/about" data-nav="about">關於</a>
-      <a href="#/page/contact" data-nav="contact">聯絡</a>
-    </nav>
-    <div class="topbar-right">
-      <div class="search-box">
-        <input id="searchInput" type="text" placeholder="搜尋標題、摘要或內容">
-        <button id="searchButton" class="secondary" type="button">搜尋</button>
-      </div>
-      <button id="toggleForm">＋ 新增 / 編輯</button>
-    </div>
-  </header>
-
-  <main class="container">
-    <section class="hero">
-      <div>
-        <h1 id="heroTitle">極簡部落格</h1>
-        <p id="heroLead">專注閱讀的部落格體驗：支援分類、標籤、全文搜尋與草稿預覽。</p>
-      </div>
-      <div class="actions">
-        <button id="openCms" class="secondary" type="button">管理文章</button>
-      </div>
-    </section>
-
-    <form id="postForm" class="card">
-      <input id="editingId" type="hidden">
-      <div class="grid">
-        <div>
-          <label for="title">文章標題</label>
-          <input id="title" name="title" type="text" placeholder="請輸入標題" required>
-        </div>
-        <div>
-          <label for="slug">Slug（可編輯）</label>
-          <input id="slug" name="slug" type="text" placeholder="does-name-affect-life" required>
-        </div>
-        <div>
-          <label for="category">分類</label>
-          <input id="category" name="category" type="text" placeholder="例如：技術、生活" value="未分類">
-        </div>
-        <div>
-          <label for="tags">標籤（以逗號分隔）</label>
-          <input id="tags" name="tags" type="text" placeholder="JavaScript, 旅遊, 心得">
-        </div>
-        <div>
-          <label for="coverImage">封面圖 URL（可留空）</label>
-          <input id="coverImage" name="coverImage" type="text" placeholder="https://example.com/cover.jpg">
-        </div>
-        <div>
-          <label for="status">文章狀態</label>
-          <select id="status" name="status">
-            <option value="published" selected>published</option>
-            <option value="draft">draft</option>
-          </select>
-        </div>
-        <div>
-          <label for="publishedAt">發佈日期</label>
-          <input id="publishedAt" name="publishedAt" type="date">
-        </div>
-      </div>
-
-      <div>
-        <label for="excerpt">摘要（未填則自動截取內容開頭）</label>
-        <textarea id="excerpt" name="excerpt" placeholder="請輸入摘要"></textarea>
-      </div>
-
-      <div>
-        <label for="content">文章內容 (Markdown)</label>
-        <textarea id="content" name="content" placeholder="請輸入內容" required></textarea>
-      </div>
+  <div class="shell">
+    <main class="hero">
+      <p class="eyebrow">中文獨立部落格</p>
+      <h1>不靠平台、不被演算法綁架</h1>
+      <p class="subtitle">
+        這裡收錄作者自行掌控的中文內容，專注於文字本身，不被推薦系統左右。歡迎直接閱讀、訂閱或分享給需要的人。
+      </p>
 
       <div class="actions">
-        <button type="submit" id="submitPost">儲存文章</button>
-        <button type="button" id="cancelEdit" class="secondary">取消編輯</button>
+        <a class="cta" href="blog.html">進入文章列表</a>
+        <span class="pill">公開文章、隨時更新</span>
       </div>
-      <p class="meta">僅 published 文章會出現在列表；草稿可透過私密預覽連結查看。</p>
-    </form>
 
-    <section id="listView" class="view visible">
-      <div class="view-header">
-        <div>
-          <h2 id="listHeading" class="view-title">最新文章</h2>
-          <p id="listSubtitle" class="meta">只顯示 published 文章，支援分頁、分類與標籤瀏覽。</p>
-        </div>
-        <div class="pagination">
-          <button id="prevPage" class="secondary" type="button">← 上一頁</button>
-          <div id="pageInfo" class="meta"></div>
-          <button id="nextPage" class="secondary" type="button">下一頁 →</button>
-        </div>
-      </div>
-      <div id="postList" class="posts"></div>
-    </section>
-
-    <section id="postView" class="view card">
-      <div class="view-header">
-        <h2 id="postTitle" class="view-title"></h2>
-        <span id="postStatus" class="status"></span>
-      </div>
-      <div class="article-meta">
-        <span id="postAuthor"></span>
-        <span id="postDate"></span>
-        <span id="postCategory" class="chip"></span>
-        <span id="postReading" class="chip"></span>
-      </div>
-      <div class="tags" id="postTags"></div>
-      <div class="grid-2">
-        <div class="article-grid">
-          <div id="postCoverWrapper"></div>
-          <div id="postContent" class="article-body"></div>
-        </div>
-        <aside class="toc">
-          <h3>目錄</h3>
-          <ul id="tocList"></ul>
-        </aside>
-      </div>
-      <div class="grid-2">
-        <div>
-          <h3>上一篇 / 下一篇</h3>
-          <div id="postNeighbors" class="posts"></div>
-        </div>
-        <div>
-          <h3>相關文章</h3>
-          <div id="relatedPosts" class="posts"></div>
-        </div>
-      </div>
-    </section>
-
-    <section id="manageView" class="card view">
-      <div class="view-header">
-        <h2 class="view-title">後台管理</h2>
-        <p class="meta">包含 draft 與 published，支援編輯、刪除與私密預覽連結。</p>
-      </div>
-      <div id="manageList" class="posts"></div>
-      <div class="notice">靜態頁面可在此編輯，包含關於、聯絡、隱私權政策與免責聲明。</div>
-      <form id="staticForm" class="static-form">
-        <div class="grid">
-          <div>
-            <label for="aboutTitle">關於：標題</label>
-            <input id="aboutTitle" type="text" placeholder="關於本站">
-            <label for="aboutBody">關於：內容</label>
-            <textarea id="aboutBody" placeholder="輸入關於內容"></textarea>
-          </div>
-          <div>
-            <label for="contactTitle">聯絡：標題</label>
-            <input id="contactTitle" type="text" placeholder="聯絡方式">
-            <label for="contactBody">聯絡：內容</label>
-            <textarea id="contactBody" placeholder="輸入聯絡方式說明"></textarea>
-          </div>
-          <div>
-            <label for="privacyTitle">隱私權政策：標題</label>
-            <input id="privacyTitle" type="text" placeholder="隱私權政策">
-            <label for="privacyBody">隱私權政策：內容</label>
-            <textarea id="privacyBody" placeholder="輸入隱私權政策"></textarea>
-          </div>
-          <div>
-            <label for="disclaimerTitle">免責聲明：標題</label>
-            <input id="disclaimerTitle" type="text" placeholder="免責聲明">
-            <label for="disclaimerBody">免責聲明：內容</label>
-            <textarea id="disclaimerBody" placeholder="輸入免責聲明"></textarea>
-          </div>
-        </div>
-        <div class="actions">
-          <button type="submit">儲存靜態頁面</button>
-          <span id="staticStatus" class="meta"></span>
-        </div>
-      </form>
-    </section>
-
-    <section id="staticPage" class="card view">
-      <h2 id="staticTitle" class="view-title"></h2>
-      <p id="staticBody" class="article-body"></p>
-    </section>
-
-    <section id="searchView" class="card view">
-      <div class="view-header">
-        <h2 class="view-title">搜尋結果</h2>
-        <p id="searchMeta" class="meta"></p>
-      </div>
-      <div id="searchResults" class="posts"></div>
-    </section>
-
-  </main>
-
-  <footer>
-    <div class="footer-links">
-      <a href="#/page/about">關於</a>
-      <a href="#/blog">Blog</a>
-      <a href="#/page/contact">聯絡</a>
-      <a href="#/page/privacy">隱私權政策</a>
-      <a href="#/page/disclaimer">免責聲明</a>
-    </div>
-    <div>Copyright © 極簡部落格</div>
-  </footer>
-
-  <script>
-    const storageKey = 'blogPosts';
-    const staticStorageKey = 'staticPages';
-    const pageSize = 6;
-    const authorName = '極簡作者';
-    let currentPage = 1;
-    let currentContext = { type: 'blog', value: null };
-
-    marked.setOptions({
-      gfm: true,
-      breaks: true,
-    });
-
-    const views = {
-      list: document.getElementById('listView'),
-      post: document.getElementById('postView'),
-      manage: document.getElementById('manageView'),
-      static: document.getElementById('staticPage'),
-      search: document.getElementById('searchView'),
-    };
-
-    const postList = document.getElementById('postList');
-    const postForm = document.getElementById('postForm');
-    const toggleFormBtn = document.getElementById('toggleForm');
-    const titleInput = document.getElementById('title');
-    const slugInput = document.getElementById('slug');
-    const contentInput = document.getElementById('content');
-    const excerptInput = document.getElementById('excerpt');
-    const coverInput = document.getElementById('coverImage');
-    const categoryInput = document.getElementById('category');
-    const tagsInput = document.getElementById('tags');
-    const statusInput = document.getElementById('status');
-    const publishedAtInput = document.getElementById('publishedAt');
-    const pageInfo = document.getElementById('pageInfo');
-    const prevPageBtn = document.getElementById('prevPage');
-    const nextPageBtn = document.getElementById('nextPage');
-    const listHeading = document.getElementById('listHeading');
-    const listSubtitle = document.getElementById('listSubtitle');
-    const manageList = document.getElementById('manageList');
-    const editingIdInput = document.getElementById('editingId');
-    const cancelEditBtn = document.getElementById('cancelEdit');
-    const postTitle = document.getElementById('postTitle');
-    const postStatus = document.getElementById('postStatus');
-    const postAuthor = document.getElementById('postAuthor');
-    const postDate = document.getElementById('postDate');
-    const postCategory = document.getElementById('postCategory');
-    const postReading = document.getElementById('postReading');
-    const postTags = document.getElementById('postTags');
-    const postContent = document.getElementById('postContent');
-    const tocList = document.getElementById('tocList');
-    const postCoverWrapper = document.getElementById('postCoverWrapper');
-    const postNeighbors = document.getElementById('postNeighbors');
-    const relatedPosts = document.getElementById('relatedPosts');
-    const searchInput = document.getElementById('searchInput');
-    const searchButton = document.getElementById('searchButton');
-    const searchResults = document.getElementById('searchResults');
-    const searchMeta = document.getElementById('searchMeta');
-    const staticTitle = document.getElementById('staticTitle');
-    const staticBody = document.getElementById('staticBody');
-    const staticForm = document.getElementById('staticForm');
-    const aboutTitleInput = document.getElementById('aboutTitle');
-    const aboutBodyInput = document.getElementById('aboutBody');
-    const contactTitleInput = document.getElementById('contactTitle');
-    const contactBodyInput = document.getElementById('contactBody');
-    const privacyTitleInput = document.getElementById('privacyTitle');
-    const privacyBodyInput = document.getElementById('privacyBody');
-    const disclaimerTitleInput = document.getElementById('disclaimerTitle');
-    const disclaimerBodyInput = document.getElementById('disclaimerBody');
-    const staticStatus = document.getElementById('staticStatus');
-
-    function slugify(text) {
-      return (text || '')
-        .normalize('NFKD')
-        .replace(/\p{Diacritic}/gu, '')
-        .replace(/[^\w\s-]/g, '')
-        .trim()
-        .replace(/\s+/g, '-')
-        .toLowerCase() || 'untitled';
-    }
-
-    function ensureUniqueSlug(slug, existing, currentId) {
-      let base = slug || 'untitled';
-      let unique = base;
-      let counter = 2;
-      while (existing.has(unique) && (!currentId || !existing.get(unique) || existing.get(unique) !== currentId)) {
-        unique = `${base}-${counter}`;
-        counter += 1;
-      }
-      existing.set(unique, currentId || true);
-      return unique;
-    }
-
-    function parseJSON(raw) {
-      if (!raw) return [];
-      try {
-        const parsed = JSON.parse(raw);
-        return Array.isArray(parsed) ? parsed : [];
-      } catch {
-        return [];
-      }
-    }
-
-    function normalizePosts(rawPosts) {
-      const slugMap = new Map();
-      return rawPosts.map((raw) => {
-        const status = raw.status === 'draft' ? 'draft' : 'published';
-        const baseTitle = raw.title?.trim() || '未命名文章';
-        const normalizedSlug = ensureUniqueSlug(raw.slug || slugify(baseTitle), slugMap, raw.id);
-        return {
-          id: raw.id ?? crypto.randomUUID?.() ?? Date.now(),
-          title: baseTitle,
-          slug: normalizedSlug,
-          content: raw.content || '',
-          excerpt: raw.excerpt?.trim() || generateExcerpt(raw.content || ''),
-          coverImage: raw.coverImage?.trim() || '',
-          category: raw.category?.trim() || '未分類',
-          tags: normalizeTags(raw.tags),
-          status,
-          createdAt: raw.createdAt || new Date().toISOString(),
-          publishedAt:
-            status === 'published'
-              ? raw.publishedAt || raw.createdAt || new Date().toISOString()
-              : null,
-          previewToken: raw.previewToken || crypto.randomUUID?.() || Math.random().toString(36).slice(2),
-        };
-      });
-    }
-
-    function loadPosts() {
-      const raw = localStorage.getItem(storageKey);
-      const parsed = parseJSON(raw);
-      const normalized = normalizePosts(parsed);
-      if (JSON.stringify(parsed) !== JSON.stringify(normalized)) {
-        savePosts(normalized);
-      }
-      return normalized;
-    }
-
-    function savePosts(posts) {
-      localStorage.setItem(storageKey, JSON.stringify(posts));
-    }
-
-    function nextId(posts) {
-      return posts.reduce((max, post) => Math.max(max, Number(post.id) || 0), 0) + 1;
-    }
-
-    function parseDate(value) {
-      if (!value) return null;
-      const date = new Date(value);
-      return Number.isNaN(date.getTime()) ? null : date;
-    }
-
-    function formatDate(value) {
-      const date = parseDate(value);
-      if (!date) return '未知日期';
-      return date.toLocaleDateString('zh-TW', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-      });
-    }
-
-    function generateExcerpt(content) {
-      const trimmed = (content || '').trim();
-      const slice = trimmed.slice(0, 120);
-      return slice + (trimmed.length > 120 ? '…' : '');
-    }
-
-    async function fetchPostsFromFile() {
-      try {
-        const response = await fetch('posts.json', { cache: 'no-store' });
-        if (!response.ok) return [];
-        const data = await response.json();
-        return Array.isArray(data) ? data : [];
-      } catch {
-        return [];
-      }
-    }
-
-    async function bootstrapPosts() {
-      const stored = parseJSON(localStorage.getItem(storageKey));
-      if (stored.length > 0) return;
-
-      const seeded = await fetchPostsFromFile();
-      if (seeded.length > 0) {
-        savePosts(normalizePosts(seeded));
-      }
-    }
-
-    function estimateReadingTime(content) {
-      const pureText = (content || '').replace(/\s+/g, '');
-      const minutes = Math.max(1, Math.ceil(pureText.length / 500));
-      return `${minutes} 分鐘閱讀`;
-    }
-
-    function normalizeTags(tags) {
-      if (Array.isArray(tags)) {
-        return tags.map((tag) => String(tag).trim()).filter(Boolean);
-      }
-      if (typeof tags === 'string') {
-        return tags.split(',').map((tag) => tag.trim()).filter(Boolean);
-      }
-      return [];
-    }
-
-    function defaultStaticPages() {
-      return {
-        about: {
-          title: '關於本站',
-          body: '這是一個極簡部落格示範，提供 Markdown 文章、分類標籤、全文搜尋與草稿私密預覽。',
-        },
-        contact: {
-          title: '聯絡方式',
-          body: '如需聯繫，請發信至 contact@example.com，或透過社群媒體留言。',
-        },
-        privacy: {
-          title: '隱私權政策',
-          body: '本站僅於本機瀏覽器儲存文章資料，不會傳送至伺服器。',
-        },
-        disclaimer: {
-          title: '免責聲明',
-          body: '本站內容僅供參考，若涉及命理或建議，請自行判斷與承擔風險。',
-        },
-      };
-    }
-
-    function loadStaticPages() {
-      const raw = localStorage.getItem(staticStorageKey);
-      let parsed;
-      try {
-        parsed = raw ? JSON.parse(raw) : null;
-      } catch {
-        parsed = null;
-      }
-      const defaults = defaultStaticPages();
-      const pages = { ...defaults, ...(parsed || {}) };
-      saveStaticPages(pages);
-      return pages;
-    }
-
-    function saveStaticPages(pages) {
-      localStorage.setItem(staticStorageKey, JSON.stringify(pages));
-    }
-
-    function setDefaultPublishDate() {
-      const today = new Date();
-      const yyyyMmDd = today.toISOString().split('T')[0];
-      publishedAtInput.value = yyyyMmDd;
-    }
-
-    function renderEmptyState(target, message) {
-      target.innerHTML = `<div class="empty">${message}</div>`;
-    }
-
-    function populateStaticForm() {
-      const pages = loadStaticPages();
-      aboutTitleInput.value = pages.about.title;
-      aboutBodyInput.value = pages.about.body;
-      contactTitleInput.value = pages.contact.title;
-      contactBodyInput.value = pages.contact.body;
-      privacyTitleInput.value = pages.privacy.title;
-      privacyBodyInput.value = pages.privacy.body;
-      disclaimerTitleInput.value = pages.disclaimer.title;
-      disclaimerBodyInput.value = pages.disclaimer.body;
-    }
-
-    function buildPostFromForm() {
-      const posts = loadPosts();
-      const status = statusInput.value;
-      const publishedAtValue = publishedAtInput.value;
-      const content = contentInput.value.trim();
-      const excerpt = excerptInput.value.trim() || generateExcerpt(content);
-      const baseSlug = slugInput.value.trim() || slugify(titleInput.value.trim());
-      const slugMap = new Map(loadPosts().map((post) => [post.slug, post.id]));
-      const uniqueSlug = ensureUniqueSlug(baseSlug, slugMap, editingIdInput.value || null);
-
-      return {
-        id: editingIdInput.value || nextId(posts),
-        title: titleInput.value.trim() || '未命名文章',
-        slug: uniqueSlug,
-        content,
-        excerpt,
-        coverImage: coverInput.value.trim(),
-        category: categoryInput.value.trim() || '未分類',
-        tags: normalizeTags(tagsInput.value),
-        status,
-        createdAt: editingIdInput.value ? posts.find((p) => String(p.id) === String(editingIdInput.value))?.createdAt || new Date().toISOString() : new Date().toISOString(),
-        publishedAt:
-          status === 'published'
-            ? (publishedAtValue ? new Date(publishedAtValue).toISOString() : new Date().toISOString())
-            : null,
-        previewToken: editingIdInput.value
-          ? posts.find((p) => String(p.id) === String(editingIdInput.value))?.previewToken
-          : crypto.randomUUID?.() || Math.random().toString(36).slice(2),
-      };
-    }
-
-    function upsertPost(post) {
-      const posts = loadPosts();
-      const index = posts.findIndex((p) => String(p.id) === String(post.id));
-
-      if (index === -1) {
-        posts.push(post);
-      } else {
-        posts[index] = { ...posts[index], ...post };
-      }
-
-      savePosts(posts);
-      currentPage = 1;
-      renderList();
-      renderManageList();
-    }
-
-    function deletePost(id) {
-      const numericId = Number(id);
-      const posts = loadPosts();
-      const filtered = posts.filter((post) => Number(post.id) !== numericId);
-      savePosts(filtered);
-      renderList();
-      renderManageList();
-    }
-
-    function renderPostCard(post, target) {
-      const wrapper = document.createElement('article');
-      wrapper.className = 'post';
-      wrapper.onclick = () => navigateTo(`#/blog/${post.slug}`);
-
-      if (post.coverImage) {
-        const cover = document.createElement('img');
-        cover.className = 'cover';
-        cover.src = post.coverImage;
-        cover.alt = `${post.title} 的封面圖`;
-        wrapper.appendChild(cover);
-      }
-
-      const header = document.createElement('header');
-      const title = document.createElement('h2');
-      title.textContent = post.title;
-
-      const badge = document.createElement('span');
-      badge.className = 'badge';
-      badge.textContent = post.category;
-      badge.onclick = (event) => {
-        event.stopPropagation();
-        navigateTo(`#/category/${encodeURIComponent(post.category)}`);
-      };
-
-      header.append(title, badge);
-
-      const excerpt = document.createElement('p');
-      excerpt.textContent = post.excerpt;
-
-      const meta = document.createElement('div');
-      meta.className = 'post-meta';
-
-      const metaDate = document.createElement('span');
-      metaDate.textContent = `發佈於 ${formatDate(post.publishedAt)}`;
-
-      const reading = document.createElement('span');
-      reading.className = 'reading-time';
-      reading.textContent = estimateReadingTime(post.content);
-
-      meta.append(metaDate, reading);
-
-      const tags = document.createElement('div');
-      tags.className = 'tags';
-      if (post.tags.length) {
-        post.tags.forEach((tag) => {
-          const pill = document.createElement('span');
-          pill.className = 'tag';
-          pill.textContent = `#${tag}`;
-          pill.onclick = (event) => {
-            event.stopPropagation();
-            navigateTo(`#/tag/${encodeURIComponent(tag)}`);
-          };
-          tags.appendChild(pill);
-        });
-      }
-
-      wrapper.append(header, excerpt);
-      if (post.tags.length) {
-        wrapper.appendChild(tags);
-      }
-      wrapper.append(meta);
-      target.appendChild(wrapper);
-    }
-
-    function renderList() {
-      let posts = loadPosts().filter((post) => post.status === 'published');
-
-      if (posts.length === 0) {
-        renderEmptyState(postList, '目前沒有已發佈的文章，試著新增一篇吧！');
-        pageInfo.textContent = '尚未有 published 文章。';
-        prevPageBtn.disabled = true;
-        nextPageBtn.disabled = true;
-        return;
-      }
-
-      posts.sort((a, b) => {
-        const timeA = parseDate(a.publishedAt)?.getTime() || 0;
-        const timeB = parseDate(b.publishedAt)?.getTime() || 0;
-        return timeB - timeA;
-      });
-
-      if (currentContext.type === 'category') {
-        posts = posts.filter((post) => post.category === currentContext.value);
-        listHeading.textContent = `分類：${currentContext.value}`;
-        listSubtitle.textContent = '瀏覽此分類的所有 published 文章。';
-      } else if (currentContext.type === 'tag') {
-        posts = posts.filter((post) => post.tags.includes(currentContext.value));
-        listHeading.textContent = `標籤：${currentContext.value}`;
-        listSubtitle.textContent = '瀏覽具有該標籤的 published 文章。';
-      } else {
-        listHeading.textContent = '最新文章';
-        listSubtitle.textContent = '只顯示 published 文章，支援分頁、分類與標籤瀏覽。';
-      }
-
-      if (posts.length === 0) {
-        renderEmptyState(postList, '目前此分類或標籤沒有已發佈的文章。');
-        pageInfo.textContent = '無 published 文章可顯示。';
-        prevPageBtn.disabled = true;
-        nextPageBtn.disabled = true;
-        return;
-      }
-
-      const totalPages = Math.max(1, Math.ceil(posts.length / pageSize));
-      currentPage = Math.min(currentPage, totalPages);
-      const start = (currentPage - 1) * pageSize;
-      const visible = posts.slice(start, start + pageSize);
-
-      postList.innerHTML = '';
-      visible.forEach((post) => renderPostCard(post, postList));
-
-      pageInfo.textContent = `第 ${currentPage} / ${totalPages} 頁 · 共 ${posts.length} 篇 published 文章`;
-      prevPageBtn.disabled = currentPage === 1;
-      nextPageBtn.disabled = currentPage === totalPages;
-      showView('list');
-      setPageTitle('極簡部落格｜文章列表');
-    }
-
-    function renderManageList() {
-      const posts = loadPosts();
-      if (posts.length === 0) {
-        renderEmptyState(manageList, '尚無文章，請先新增。');
-        return;
-      }
-      manageList.innerHTML = '';
-      posts
-        .sort((a, b) => parseDate(b.createdAt)?.getTime() - parseDate(a.createdAt)?.getTime())
-        .forEach((post) => {
-          const row = document.createElement('article');
-          row.className = 'post';
-          row.innerHTML = `
-            <header>
-              <div>
-                <h2>${post.title}</h2>
-                <div class="post-meta">${post.category} · ${post.tags.map((t) => `#${t}`).join(' ')}</div>
-              </div>
-              <span class="status ${post.status}">${post.status}</span>
-            </header>
-            <p class="meta">Slug: ${post.slug}</p>
-            <div class="tags">預覽連結： <span class="mono">${buildPreviewUrl(post)}</span></div>
-            <div class="actions">
-              <button class="secondary" data-edit-id="${post.id}">編輯</button>
-              <button class="danger" data-delete-id="${post.id}">刪除</button>
-              <button class="secondary" data-preview="${post.slug}" data-token="${post.previewToken}">開啟預覽</button>
-            </div>
-          `;
-          manageList.appendChild(row);
-        });
-    }
-
-    function renderSearch(query) {
-      const posts = loadPosts().filter((post) => post.status === 'published');
-      const q = (query || '').toLowerCase().trim();
-      const results = posts.filter((post) => {
-        const haystack = `${post.title} ${post.excerpt} ${post.content}`.toLowerCase();
-        return haystack.includes(q);
-      });
-
-      searchResults.innerHTML = '';
-      searchMeta.textContent = q ? `「${q}」共有 ${results.length} 筆結果` : '請輸入關鍵字後搜尋。';
-
-      if (!q || results.length === 0) {
-        const message = q ? '沒有符合的已發佈文章。' : '尚未提供搜尋關鍵字。';
-        renderEmptyState(searchResults, message);
-      } else {
-        results.slice(0, 30).forEach((post) => renderPostCard(post, searchResults));
-      }
-
-      showView('search');
-      setPageTitle(`搜尋：${q}｜極簡部落格`);
-    }
-
-    function buildTOC(container) {
-      tocList.innerHTML = '';
-      const headings = container.querySelectorAll('h2, h3');
-      if (!headings.length) {
-        tocList.innerHTML = '<li>未檢測到章節</li>';
-        return;
-      }
-      headings.forEach((heading, index) => {
-        const anchor = heading.id || `section-${index + 1}`;
-        heading.id = anchor;
-        const li = document.createElement('li');
-        li.style.marginLeft = heading.tagName === 'H3' ? '12px' : '0';
-        const link = document.createElement('a');
-        link.href = `#${anchor}`;
-        link.textContent = heading.textContent;
-        li.appendChild(link);
-        tocList.appendChild(li);
-      });
-    }
-
-    function renderNeighbors(posts, currentSlug) {
-      postNeighbors.innerHTML = '';
-      const index = posts.findIndex((p) => p.slug === currentSlug);
-      const neighbors = [];
-      if (index > 0) neighbors.push(posts[index - 1]);
-      if (index < posts.length - 1) neighbors.push(posts[index + 1]);
-      if (neighbors.length === 0) {
-        renderEmptyState(postNeighbors, '沒有上一篇或下一篇文章。');
-        return;
-      }
-      neighbors.forEach((post) => renderPostCard(post, postNeighbors));
-    }
-
-    function renderRelated(posts, currentPost) {
-      relatedPosts.innerHTML = '';
-      const related = posts.filter((post) => {
-        if (post.slug === currentPost.slug) return false;
-        const sameCategory = post.category === currentPost.category;
-        const sharedTag = post.tags.some((tag) => currentPost.tags.includes(tag));
-        return sameCategory || sharedTag;
-      });
-
-      if (!related.length) {
-        renderEmptyState(relatedPosts, '暫無相關文章。');
-        return;
-      }
-
-      related.slice(0, 3).forEach((post) => renderPostCard(post, relatedPosts));
-    }
-
-    function pageBase() {
-      const { origin, pathname } = window.location;
-      return origin === 'null' || origin === 'file://' ? pathname : `${origin}${pathname}`;
-    }
-
-    function buildPreviewUrl(post) {
-      const base = pageBase();
-      return `${base}#/blog/${post.slug}?preview=${post.previewToken}`;
-    }
-
-    function renderPostDetail(slug, previewToken) {
-      const posts = loadPosts();
-      const target = posts.find((post) => post.slug === slug);
-
-      if (!target) {
-        postTitle.textContent = '找不到文章';
-        postContent.innerHTML = '';
-        renderEmptyState(postContent, '該文章不存在或已被刪除。');
-        showView('post');
-        return;
-      }
-
-      if (target.status === 'draft' && target.previewToken !== previewToken) {
-        postTitle.textContent = '草稿保護中';
-        postContent.innerHTML = '';
-        renderEmptyState(postContent, '此草稿僅能透過私密預覽連結存取。');
-        showView('post');
-        return;
-      }
-
-      postTitle.textContent = target.title;
-      postStatus.textContent = target.status;
-      postStatus.className = `status ${target.status}`;
-      postAuthor.textContent = `作者：${authorName}`;
-      postDate.textContent = `發佈：${formatDate(target.publishedAt)}`;
-      postCategory.textContent = target.category;
-      postCategory.onclick = () => navigateTo(`#/category/${encodeURIComponent(target.category)}`);
-      postReading.textContent = estimateReadingTime(target.content);
-
-      postTags.innerHTML = '';
-      target.tags.forEach((tag) => {
-        const pill = document.createElement('span');
-        pill.className = 'tag';
-        pill.textContent = `#${tag}`;
-        pill.onclick = () => navigateTo(`#/tag/${encodeURIComponent(tag)}`);
-        postTags.appendChild(pill);
-      });
-
-      postCoverWrapper.innerHTML = '';
-      if (target.coverImage) {
-        const img = document.createElement('img');
-        img.src = target.coverImage;
-        img.alt = `${target.title} 的封面圖`;
-        img.className = 'cover';
-        postCoverWrapper.appendChild(img);
-      }
-
-      postContent.innerHTML = marked.parse(target.content || '');
-      buildTOC(postContent);
-
-      const publishedPosts = posts.filter((post) => post.status === 'published').sort((a, b) => {
-        const timeA = parseDate(a.publishedAt)?.getTime() || 0;
-        const timeB = parseDate(b.publishedAt)?.getTime() || 0;
-        return timeB - timeA;
-      });
-
-      renderNeighbors(publishedPosts, target.slug);
-      renderRelated(publishedPosts, target);
-      showView('post');
-      setPageTitle(`${target.title}｜極簡部落格`);
-    }
-
-    function renderStaticPage(slug) {
-      const pages = loadStaticPages();
-      const page = pages[slug];
-      if (!page) {
-        staticTitle.textContent = '找不到頁面';
-        staticBody.textContent = '請確認網址是否正確。';
-      } else {
-        staticTitle.textContent = page.title;
-        staticBody.textContent = page.body;
-      }
-      showView('static');
-      setPageTitle(`${staticTitle.textContent}｜極簡部落格`);
-    }
-
-    function showView(name) {
-      Object.values(views).forEach((view) => view.classList.remove('visible'));
-      if (views[name]) views[name].classList.add('visible');
-    }
-
-    function navigateTo(hash) {
-      window.location.hash = hash;
-    }
-
-    function parseHash() {
-      const raw = window.location.hash.replace('#', '') || '/blog';
-      const [path, queryString] = raw.split('?');
-      const segments = path.split('/').filter(Boolean);
-      const query = new URLSearchParams(queryString || '');
-      return { segments, query };
-    }
-
-    function handleRoute() {
-      const { segments, query } = parseHash();
-      const main = segments[0] || 'blog';
-      let navKey = main;
-
-      document.querySelectorAll('.nav-links a').forEach((link) => link.classList.remove('active'));
-
-      if (main === 'blog' && segments[1]) {
-        currentContext = { type: 'blog', value: null };
-        renderPostDetail(decodeURIComponent(segments[1]), query.get('preview'));
-      } else if (main === 'category') {
-        currentContext = { type: 'category', value: decodeURIComponent(segments[1] || '') };
-        renderList();
-      } else if (main === 'tag') {
-        currentContext = { type: 'tag', value: decodeURIComponent(segments[1] || '') };
-        renderList();
-      } else if (main === 'search') {
-        renderSearch(query.get('q') || '');
-      } else if (main === 'page') {
-        const slug = segments[1] || 'about';
-        renderStaticPage(slug);
-        navKey = slug;
-      } else {
-        currentContext = { type: 'blog', value: null };
-        renderList();
-      }
-
-      const navActive = document.querySelector(`.nav-links a[data-nav="${navKey}"]`);
-      if (navActive) navActive.classList.add('active');
-    }
-
-    function setPageTitle(title) {
-      document.title = title || '極簡部落格';
-    }
-
-
-    toggleFormBtn.addEventListener('click', () => {
-      postForm.classList.toggle('visible');
-      if (postForm.classList.contains('visible')) {
-        titleInput.focus();
-      }
-    });
-
-    cancelEditBtn.addEventListener('click', () => {
-      postForm.reset();
-      editingIdInput.value = '';
-      setDefaultPublishDate();
-      statusInput.value = 'published';
-    });
-
-    titleInput.addEventListener('input', () => {
-      if (!editingIdInput.value) {
-        slugInput.value = slugify(titleInput.value);
-      }
-    });
-
-    prevPageBtn.addEventListener('click', () => {
-      if (currentPage > 1) {
-        currentPage -= 1;
-        renderList();
-      }
-    });
-
-    nextPageBtn.addEventListener('click', () => {
-      currentPage += 1;
-      renderList();
-    });
-
-    postForm.addEventListener('submit', (event) => {
-      event.preventDefault();
-      const title = titleInput.value;
-      const content = contentInput.value;
-
-      if (!title.trim() || !content.trim()) {
-        alert('請輸入完整的標題與內容');
-        return;
-      }
-
-      const post = buildPostFromForm();
-      upsertPost(post);
-      postForm.reset();
-      setDefaultPublishDate();
-      statusInput.value = 'published';
-      postForm.classList.remove('visible');
-    });
-
-    manageList.addEventListener('click', (event) => {
-      const target = event.target;
-      if (target.dataset.editId) {
-        const posts = loadPosts();
-        const post = posts.find((p) => String(p.id) === target.dataset.editId);
-        if (!post) return;
-        editingIdInput.value = post.id;
-        titleInput.value = post.title;
-        slugInput.value = post.slug;
-        categoryInput.value = post.category;
-        tagsInput.value = post.tags.join(', ');
-        coverInput.value = post.coverImage;
-        statusInput.value = post.status;
-        publishedAtInput.value = post.publishedAt ? post.publishedAt.split('T')[0] : '';
-        excerptInput.value = post.excerpt;
-        contentInput.value = post.content;
-        postForm.classList.add('visible');
-        titleInput.focus();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
-      if (target.dataset.deleteId) {
-        deletePost(target.dataset.deleteId);
-      }
-      if (target.dataset.preview) {
-        const url = `${pageBase()}#/blog/${target.dataset.preview}?preview=${target.dataset.token}`;
-        window.open(url, '_blank');
-      }
-    });
-
-    staticForm.addEventListener('submit', (event) => {
-      event.preventDefault();
-      const updated = {
-        about: { title: aboutTitleInput.value.trim() || '關於本站', body: aboutBodyInput.value.trim() },
-        contact: { title: contactTitleInput.value.trim() || '聯絡方式', body: contactBodyInput.value.trim() },
-        privacy: { title: privacyTitleInput.value.trim() || '隱私權政策', body: privacyBodyInput.value.trim() },
-        disclaimer: { title: disclaimerTitleInput.value.trim() || '免責聲明', body: disclaimerBodyInput.value.trim() },
-      };
-      saveStaticPages(updated);
-      staticStatus.textContent = '已儲存靜態頁面內容';
-      const { segments } = parseHash();
-      if (segments[0] === 'page' && segments[1]) {
-        renderStaticPage(segments[1]);
-      }
-      setTimeout(() => {
-        staticStatus.textContent = '';
-      }, 2000);
-    });
-
-    searchButton.addEventListener('click', () => {
-      const query = searchInput.value;
-      navigateTo(`#/search?q=${encodeURIComponent(query)}`);
-    });
-
-    searchInput.addEventListener('keydown', (event) => {
-      if (event.key === 'Enter') {
-        event.preventDefault();
-        searchButton.click();
-      }
-    });
-
-    document.getElementById('openCms').addEventListener('click', () => {
-      showView('manage');
-      renderManageList();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-
-    window.addEventListener('hashchange', handleRoute);
-
-    async function init() {
-      setDefaultPublishDate();
-      await bootstrapPosts();
-      loadStaticPages();
-      populateStaticForm();
-      renderManageList();
-      handleRoute();
-    }
-
-    init();
-  </script>
+      <ul class="list">
+        <li>以作者為中心，所有文章直接由作者掌控。</li>
+        <li>公開閱讀使用匿名金鑰，僅顯示已發布內容。</li>
+        <li>未來將提供草稿與排程，現在先享受純閱讀體驗。</li>
+      </ul>
+    </main>
+
+    <footer>
+      <a class="admin-link" href="admin.html">作者登入</a>
+    </footer>
+  </div>
 </body>
 </html>

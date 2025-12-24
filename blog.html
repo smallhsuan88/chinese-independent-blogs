@@ -6,6 +6,9 @@
   <title>部落格文章</title>
   <style>
     body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans TC", Arial; margin: 24px; }
+    .nav { margin-bottom: 12px; }
+    .nav a { color: #2563eb; text-decoration: none; font-weight: 700; }
+    .nav a:hover { text-decoration: underline; }
     .post { padding: 14px 0; border-bottom: 1px solid #eee; }
     .title { font-size: 18px; font-weight: 700; margin: 0 0 6px; }
     .meta { color: #666; font-size: 13px; margin: 0 0 8px; }
@@ -14,6 +17,7 @@
   </style>
 </head>
 <body>
+  <div class="nav"><a href="index.html">回首頁</a></div>
   <h1>文章列表</h1>
   <div id="status">載入中...</div>
   <div id="posts"></div>
