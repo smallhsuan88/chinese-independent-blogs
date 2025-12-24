@@ -1,0 +1,12 @@
+12/24
+「可以收工」的驗收清單
+
+你現在已經全部打勾：
+ Anonymous 讀不到 draft
+ Anonymous 無法 insert
+ Authenticated 可 insert 自己文章
+ Authenticated 只能 update 自己
+ Authenticated 只能 delete 自己
+ 非作者 update = 0 rows
+ 非作者 delete = 0 rows
+ 前端只顯示 published + published_at
