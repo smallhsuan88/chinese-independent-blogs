@@ -7,12 +7,15 @@
   <style>
     body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans TC","Microsoft JhengHei",sans-serif; margin:24px; max-width:900px;}
     input,button,textarea{font-size:16px; padding:10px; margin:6px 0;}
-    textarea{width:100%; height:120px;}
+    textarea{width:100%; height:140px;}
     .row{display:flex; gap:10px; align-items:center; flex-wrap:wrap;}
     .card{border:1px solid #ddd; border-radius:10px; padding:12px; margin:10px 0;}
     .muted{color:#666;}
     .danger{color:#b00020;}
     .ok{color:#0b7a0b;}
+    .small{font-size:13px;}
+    .hr{height:1px;background:#eee;margin:10px 0;}
+    button{cursor:pointer;}
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -22,13 +25,48 @@
   <div id="status" class="muted">初始化中…</div>
 
   <div id="authBox" class="card">
-    <h3>登入（Email Magic Link）</h3>
-    <input id="email" placeholder="you@example.com" style="width:320px;" />
+    <h3>登入（雙模式：Password / Magic Link）</h3>
+
+    <label class="small muted">Email</label><br/>
+    <input id="email" placeholder="you@example.com" style="width:320px;" autocomplete="email" />
+
+    <div class="hr"></div>
+
+    <!-- A) Password Login -->
+    <div>
+      <div class="row">
+        <div style="min-width:140px;"><b>Password 登入</b></div>
+        <button id="btnLoginPassword">Email + Password 登入</button>
+      </div>
+
+      <label class="small muted">Password</label><br/>
+      <input id="password" type="password" placeholder="password" style="width:320px;" autocomplete="current-password" />
+
+      <div class="row">
+        <button id="btnSignUpPassword" title="建立帳號（只建議你自己用）">建立帳號（Sign up）</button>
+        <button id="btnResetPassword" title="寄送重設密碼信（也會吃寄信額度）">忘記密碼（寄重設信）</button>
+      </div>
+      <div class="muted small">
+        建議：你目前 Free 方案寄信額度非常小，若 Magic Link 常失敗，請優先用 Password 模式。
+      </div>
+    </div>
+
+    <div class="hr"></div>
+
+    <!-- B) Magic Link Login -->
+    <div>
+      <div class="row">
+        <div style="min-width:140px;"><b>Magic Link 登入</b></div>
+        <button id="btnLoginMagic">寄送登入連結</button>
+      </div>
+      <div class="muted small">提示：信件可能在垃圾郵件；Free 額度可能導致寄信失敗。</div>
+    </div>
+
+    <div class="hr"></div>
+
     <div class="row">
-      <button id="btnLogin">寄送登入連結</button>
       <button id="btnLogout" style="display:none;">登出</button>
     </div>
-    <div class="muted">提示：信件可能在垃圾郵件。</div>
   </div>
 
   <div id="app" style="display:none;">
@@ -46,17 +84,17 @@
   </div>
 
   <script>
-    // 1) 換成你的
+    // ===== 0) Supabase 設定 =====
     const SUPABASE_URL = "https://kxilbdbtzoscutxjzbss.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt4aWxiZGJ0em9zY3V0eGp6YnNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY1MTQzMzgsImV4cCI6MjA4MjA5MDMzOH0.xWhjqKF9DeqY3t3RJaU4FoL1LRRkxgYkZ34L9fgFh8g";
-
     const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // GitHub Pages 固定回跳（建議用固定值，避免路徑變動）
+    const ADMIN_REDIRECT = "https://smallhsuan88.github.io/chinese-independent-blogs/admin.html";
 
     const $ = (id) => document.getElementById(id);
     const statusEl = $("status");
-    const authBox = $("authBox");
     const appEl = $("app");
-    const btnLogin = $("btnLogin");
     const btnLogout = $("btnLogout");
     const listEl = $("list");
 
@@ -65,6 +103,13 @@
       statusEl.textContent = msg;
     }
 
+    function escapeHtml(s){
+      return String(s ?? "").replace(/[&<>"']/g, c => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+      }[c]));
+    }
+
+    // ===== 1) UI 切換 & 列表 =====
     async function refreshMeAndList(){
       const { data: { user } } = await sb.auth.getUser();
       if(!user){
@@ -78,14 +123,13 @@
       appEl.style.display = "block";
       setStatus(`已登入：${user.email}（uid: ${user.id}）`, "ok");
 
-      // 2) 讀自己的文章（draft/published 都會回來，前提：你有加 SELECT policy: author_id = auth.uid()）
       const { data, error } = await sb
         .from("posts")
         .select("id,title,slug,status,published_at,created_at")
         .order("created_at", { ascending: false });
 
       if(error){
-        listEl.innerHTML = `<div class="danger">讀取失敗：${error.message}</div>`;
+        listEl.innerHTML = `<div class="danger">讀取失敗：${escapeHtml(error.message)}</div>`;
         return;
       }
 
@@ -99,8 +143,8 @@
           <div><b>${escapeHtml(p.title || "(無標題)")}</b></div>
           <div class="muted">slug: ${escapeHtml(p.slug || "")}</div>
           <div class="row">
-            <div>狀態：<b>${p.status}</b></div>
-            <div class="muted">published_at：${p.published_at || "-"}</div>
+            <div>狀態：<b>${escapeHtml(p.status)}</b></div>
+            <div class="muted">published_at：${p.published_at ? escapeHtml(p.published_at) : "-"}</div>
           </div>
           <div class="row">
             <button onclick="publishPost('${p.id}')">發布</button>
@@ -111,14 +155,57 @@
       `).join("");
     }
 
-    function escapeHtml(s){
-      return String(s).replace(/[&<>"']/g, c => ({
-        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-      }[c]));
-    }
+    // ===== 2) Password 模式 =====
+    $("btnLoginPassword").onclick = async () => {
+      const email = $("email").value.trim();
+      const password = $("password").value;
+      if(!email) return setStatus("請輸入 email", "danger");
+      if(!password) return setStatus("請輸入 password", "danger");
 
-    // 3) 登入：寄 magic link
-    btnLogin.onclick = async () => {
+      setStatus("Password 登入中…", "muted");
+      const { error } = await sb.auth.signInWithPassword({ email, password });
+      if(error) return setStatus("登入失敗：" + error.message, "danger");
+
+      setStatus("登入成功", "ok");
+      await refreshMeAndList();
+    };
+
+    // （可選）建立帳號：只建議你自己用；若開放 signups 可能被亂註冊
+    $("btnSignUpPassword").onclick = async () => {
+      const email = $("email").value.trim();
+      const password = $("password").value;
+      if(!email) return setStatus("請輸入 email", "danger");
+      if(!password) return setStatus("請輸入 password", "danger");
+
+      setStatus("建立帳號中…", "muted");
+      const { error } = await sb.auth.signUp({
+        email,
+        password,
+        options: { emailRedirectTo: ADMIN_REDIRECT } // 若你有開 Confirm email，會走寄信流程（也可能被限流）
+      });
+
+      if(error) return setStatus("建立失敗：" + error.message, "danger");
+
+      // 若 Confirm email = ON，這裡會提示去收信；若 OFF，則可直接登入
+      setStatus("已送出建立帳號（若需驗證，請收信完成驗證後再登入）", "ok");
+    };
+
+    // 忘記密碼（會寄信，也吃寄信額度）
+    $("btnResetPassword").onclick = async () => {
+      const email = $("email").value.trim();
+      if(!email) return setStatus("請輸入 email", "danger");
+
+      setStatus("寄送重設密碼信中…", "muted");
+      const { error } = await sb.auth.resetPasswordForEmail(email, {
+        redirectTo: ADMIN_REDIRECT // 你之後可加一個 reset-password.html 來處理更新密碼；先回 admin.html 也行
+      });
+
+      if(error) return setStatus("寄送失敗：" + error.message, "danger");
+      setStatus("已寄出重設密碼信（請收信）", "ok");
+    };
+
+    // ===== 3) Magic Link 模式 =====
+    $("btnLoginMagic").onclick = async () => {
       const email = $("email").value.trim();
       if(!email) return setStatus("請輸入 email", "danger");
 
@@ -126,8 +213,7 @@
       const { error } = await sb.auth.signInWithOtp({
         email,
         options: {
-          // 讓 magic link 回到你的 admin.html（避免跳回首頁）
-          emailRedirectTo: "https://smallhsuan88.github.io/chinese-independent-blogs/admin.html"
+          emailRedirectTo: ADMIN_REDIRECT
         }
       });
 
@@ -135,12 +221,13 @@
       else setStatus("已寄出登入連結，請去收信點擊登入。", "ok");
     };
 
+    // ===== 4) 登出 =====
     btnLogout.onclick = async () => {
       await sb.auth.signOut();
       await refreshMeAndList();
     };
 
-    // 4) 建立草稿
+    // ===== 5) CRUD =====
     $("btnCreateDraft").onclick = async () => {
       const title = $("newTitle").value.trim();
       const slug  = $("newSlug").value.trim();
@@ -178,7 +265,6 @@
       }
     };
 
-    // 5) 發布流程（draft -> published）
     window.publishPost = async (id) => {
       const { error } = await sb.from("posts").update({
         status: "published",
@@ -189,7 +275,6 @@
       await refreshMeAndList();
     };
 
-    // 6) 退回草稿（published -> draft）
     window.toDraft = async (id) => {
       const { error } = await sb.from("posts").update({
         status: "draft",
@@ -200,7 +285,6 @@
       await refreshMeAndList();
     };
 
-    // 7) 刪除（只能刪自己的：靠 RLS）
     window.deletePost = async (id) => {
       if(!confirm("確定刪除？")) return;
       const { error } = await sb.from("posts").delete().eq("id", id);
@@ -208,29 +292,30 @@
       await refreshMeAndList();
     };
 
-    // init：處理 magic link 回跳的 code -> session
-(async () => {
-  try {
-    const url = new URL(window.location.href);
-    const code = url.searchParams.get("code");
-    if (code) {
-      setStatus("驗證中…", "muted");
-      const { error } = await sb.auth.exchangeCodeForSession(window.location.href);
-      if (error) throw error;
+    // ===== 6) init：處理 Magic Link 回跳 code -> session =====
+    (async () => {
+      try {
+        const url = new URL(window.location.href);
+        const code = url.searchParams.get("code");
+        // Magic Link（PKCE flow）回來會帶 code
+        if (code) {
+          setStatus("驗證中…", "muted");
+          const { error } = await sb.auth.exchangeCodeForSession(window.location.href);
+          if (error) throw error;
 
-      // 清掉 code，避免重整重複 exchange
-      url.searchParams.delete("code");
-      window.history.replaceState({}, document.title, url.toString());
-      setStatus("登入成功", "ok");
-    }
-  } catch (e) {
-    console.error(e);
-    setStatus("驗證失敗：" + (e?.message || e), "danger");
-  }
+          // 清掉 code，避免重整重複 exchange
+          url.searchParams.delete("code");
+          window.history.replaceState({}, document.title, url.toString());
+          setStatus("登入成功", "ok");
+        }
+      } catch (e) {
+        console.error(e);
+        setStatus("驗證失敗：" + (e?.message || e), "danger");
+      }
 
-  sb.auth.onAuthStateChange(() => refreshMeAndList());
-  refreshMeAndList();
-})();
+      sb.auth.onAuthStateChange(() => refreshMeAndList());
+      refreshMeAndList();
+    })();
   </script>
 </body>
 </html>
