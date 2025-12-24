@@ -43,6 +43,7 @@
         .from("posts")
         .select("id, title, slug, excerpt, published_at, created_at, category, tags")
         .eq("status", "published")
+        .not("published_at", "is", null)
         .order("published_at", { ascending: false, nullsFirst: false })
         .order("created_at", { ascending: false });
 
