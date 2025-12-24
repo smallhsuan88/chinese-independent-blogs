@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>部落格文章</title>
+  <style>
+    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans TC", Arial; margin: 24px; }
+    .post { padding: 14px 0; border-bottom: 1px solid #eee; }
+    .title { font-size: 18px; font-weight: 700; margin: 0 0 6px; }
+    .meta { color: #666; font-size: 13px; margin: 0 0 8px; }
+    .excerpt { margin: 0; color: #222; }
+    .error { color: #b00020; background: #fff2f2; padding: 10px; border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <h1>文章列表</h1>
+  <div id="status">載入中...</div>
+  <div id="posts"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    // 1) 換成你自己的
+    const SUPABASE_URL = "https://kxilbdbtzoscutxjzbss.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt4aWxiZGJ0em9zY3V0eGp6YnNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY1MTQzMzgsImV4cCI6MjA4MjA5MDMzOH0.xWhjqKF9DeqY3t3RJaU4FoL1LRRkxgYkZ34L9fgFh8g";
+
+    const { createClient } = supabase;
+    const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const statusEl = document.getElementById("status");
+    const postsEl = document.getElementById("posts");
+
+    function formatDate(ts) {
+      if (!ts) return "";
+      const d = new Date(ts);
+      return d.toLocaleString("zh-TW", { year:"numeric", month:"2-digit", day:"2-digit" });
+    }
+
+    async function loadPublishedPosts() {
+      statusEl.textContent = "載入中...";
+
+      const { data, error } = await sb
+        .from("posts")
+        .select("id, title, slug, excerpt, published_at, created_at, category, tags")
+        .eq("status", "published")
+        .order("published_at", { ascending: false, nullsFirst: false })
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        statusEl.innerHTML = `<div class="error">讀取失敗：${error.message}</div>`;
+        return;
+      }
+
+      statusEl.textContent = `共 ${data.length} 篇已發布文章`;
+
+      postsEl.innerHTML = data.map(p => {
+        const date = formatDate(p.published_at || p.created_at);
+        const tags = Array.isArray(p.tags) && p.tags.length ? `｜標籤：${p.tags.join(", ")}` : "";
+        const cat = p.category ? `分類：${p.category}` : "";
+        const meta = [date, cat].filter(Boolean).join("｜") + tags;
+
+        // 你之後可以做 post.html?slug=xxx 當單篇頁
+        const href = `post.html?slug=${encodeURIComponent(p.slug)}`;
+
+        return `
+          <div class="post">
+            <p class="title"><a href="${href}">${p.title}</a></p>
+            <p class="meta">${meta}</p>
+            <p class="excerpt">${p.excerpt ?? ""}</p>
+          </div>
+        `;
+      }).join("");
+    }
+
+    loadPublishedPosts();
+  </script>
+</body>
+</html>
