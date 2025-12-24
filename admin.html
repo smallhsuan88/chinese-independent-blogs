@@ -127,7 +127,7 @@
         email,
         options: {
           // 讓 magic link 回到你的 admin.html（避免跳回首頁）
-          emailRedirectTo: location.origin + location.pathname.replace(/\/[^\/]*$/, "/") + "admin.html"
+          emailRedirectTo: "https://smallhsuan88.github.io/chinese-independent-blogs/admin.html"
         }
       });
 
@@ -208,9 +208,29 @@
       await refreshMeAndList();
     };
 
-    // init
-    sb.auth.onAuthStateChange(() => refreshMeAndList());
-    refreshMeAndList();
+    // init：處理 magic link 回跳的 code -> session
+(async () => {
+  try {
+    const url = new URL(window.location.href);
+    const code = url.searchParams.get("code");
+    if (code) {
+      setStatus("驗證中…", "muted");
+      const { error } = await sb.auth.exchangeCodeForSession(window.location.href);
+      if (error) throw error;
+
+      // 清掉 code，避免重整重複 exchange
+      url.searchParams.delete("code");
+      window.history.replaceState({}, document.title, url.toString());
+      setStatus("登入成功", "ok");
+    }
+  } catch (e) {
+    console.error(e);
+    setStatus("驗證失敗：" + (e?.message || e), "danger");
+  }
+
+  sb.auth.onAuthStateChange(() => refreshMeAndList());
+  refreshMeAndList();
+})();
   </script>
 </body>
 </html>
