@@ -1,0 +1,20 @@
+[
+  {
+    "slug": "facebook-2024-12-13",
+    "title": "12/13 Facebook 留存",
+    "description": "剛上傳的 Facebook 截圖相簿，集中整理於 2024/12/13。",
+    "coverImage": "assets/albums/2024-12-13-facebook/Screenshot_20241213_165315_Facebook.jpg",
+    "photos": [
+      {
+        "src": "assets/albums/2024-12-13-facebook/Screenshot_20241213_165312_Facebook.jpg",
+        "alt": "Facebook 留存截圖（1）",
+        "caption": "Facebook 留存截圖 1"
+      },
+      {
+        "src": "assets/albums/2024-12-13-facebook/Screenshot_20241213_165315_Facebook.jpg",
+        "alt": "Facebook 留存截圖（2）",
+        "caption": "Facebook 留存截圖 2"
+      }
+    ]
+  }
+]

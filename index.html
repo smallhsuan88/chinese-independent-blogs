@@ -458,6 +458,74 @@
       align-items: start;
     }
 
+    .album-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .album-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      display: grid;
+      gap: 8px;
+      cursor: pointer;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
+      box-shadow: 0 10px 26px rgba(15, 23, 42, 0.04);
+    }
+
+    .album-card:hover {
+      border-color: var(--accent);
+      box-shadow: 0 12px 30px rgba(37, 99, 235, 0.12);
+      transform: translateY(-1px);
+    }
+
+    .album-card.active {
+      border-color: var(--accent);
+      box-shadow: 0 12px 30px rgba(37, 99, 235, 0.12);
+    }
+
+    .album-cover {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--tag);
+    }
+
+    .album-photos {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .photo-card {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      background: var(--card);
+      box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05);
+    }
+
+    .photo-card img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      display: block;
+      background: var(--tag);
+    }
+
+    .photo-caption {
+      padding: 10px 12px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
     footer {
       border-top: 1px solid var(--border);
       padding: 16px;
@@ -532,6 +600,7 @@
     <div class="brand">極簡部落格</div>
     <nav class="nav-links">
       <a href="#/blog" data-nav="blog" class="active">Blog</a>
+      <a href="#/albums" data-nav="albums">相簿</a>
       <a href="#/page/about" data-nav="about">關於</a>
       <a href="#/page/contact" data-nav="contact">聯絡</a>
     </nav>
@@ -711,6 +780,26 @@
       <div id="searchResults" class="posts"></div>
     </section>
 
+    <section id="albumListView" class="view card">
+      <div class="view-header">
+        <div>
+          <h2 class="view-title">相簿</h2>
+          <p class="meta">瀏覽所有上傳的照片相簿。</p>
+        </div>
+      </div>
+      <div id="albumList" class="album-cards"></div>
+    </section>
+
+    <section id="albumDetailView" class="view card">
+      <div class="view-header">
+        <div>
+          <h2 id="albumTitle" class="view-title"></h2>
+          <p id="albumDescription" class="meta"></p>
+        </div>
+      </div>
+      <div id="albumPhotos" class="album-photos"></div>
+    </section>
+
   </main>
 
   <footer>
@@ -731,6 +820,7 @@
     const authorName = '極簡作者';
     let currentPage = 1;
     let currentContext = { type: 'blog', value: null };
+    let albums = [];
 
     marked.setOptions({
       gfm: true,
@@ -743,6 +833,8 @@
       manage: document.getElementById('manageView'),
       static: document.getElementById('staticPage'),
       search: document.getElementById('searchView'),
+      albumList: document.getElementById('albumListView'),
+      albumDetail: document.getElementById('albumDetailView'),
     };
 
     const postList = document.getElementById('postList');
@@ -793,6 +885,10 @@
     const disclaimerTitleInput = document.getElementById('disclaimerTitle');
     const disclaimerBodyInput = document.getElementById('disclaimerBody');
     const staticStatus = document.getElementById('staticStatus');
+    const albumListEl = document.getElementById('albumList');
+    const albumTitleEl = document.getElementById('albumTitle');
+    const albumDescEl = document.getElementById('albumDescription');
+    const albumPhotosEl = document.getElementById('albumPhotos');
 
     function slugify(text) {
       return (text || '')
@@ -976,6 +1072,89 @@
 
     function renderEmptyState(target, message) {
       target.innerHTML = `<div class="empty">${message}</div>`;
+    }
+
+    function loadAlbums() {
+      return fetch('albums.json', { cache: 'no-store' })
+        .then((res) => (res.ok ? res.json() : []))
+        .then((data) => (Array.isArray(data) ? data : []))
+        .catch(() => []);
+    }
+
+    function renderAlbumList() {
+      if (!albums.length) {
+        renderEmptyState(albumListEl, '目前沒有相簿，請稍後再試。');
+        showView('albumList');
+        setPageTitle('相簿｜極簡部落格');
+        return;
+      }
+
+      albumListEl.innerHTML = '';
+      albums.forEach((album) => {
+        const card = document.createElement('article');
+        card.className = 'album-card';
+        card.onclick = () => navigateTo(`#/albums/${album.slug}`);
+
+        if (album.coverImage) {
+          const img = document.createElement('img');
+          img.className = 'album-cover';
+          img.src = album.coverImage;
+          img.alt = `${album.title} 封面`;
+          card.appendChild(img);
+        }
+
+        const title = document.createElement('h3');
+        title.textContent = album.title || '未命名相簿';
+        const desc = document.createElement('p');
+        desc.className = 'meta';
+        desc.textContent = album.description || '無描述';
+
+        card.append(title, desc);
+        albumListEl.appendChild(card);
+      });
+
+      showView('albumList');
+      setPageTitle('相簿｜極簡部落格');
+    }
+
+    function renderAlbumDetail(slug) {
+      const target = albums.find((album) => album.slug === slug);
+      if (!target) {
+        albumTitleEl.textContent = '找不到相簿';
+        albumDescEl.textContent = '請確認連結是否正確。';
+        albumPhotosEl.innerHTML = '';
+        renderEmptyState(albumPhotosEl, '沒有可顯示的照片。');
+        showView('albumDetail');
+        setPageTitle('相簿｜極簡部落格');
+        return;
+      }
+
+      albumTitleEl.textContent = target.title || '未命名相簿';
+      albumDescEl.textContent = target.description || '';
+
+      if (!target.photos || !target.photos.length) {
+        renderEmptyState(albumPhotosEl, '此相簿目前沒有照片。');
+      } else {
+        albumPhotosEl.innerHTML = '';
+        target.photos.forEach((photo) => {
+          const card = document.createElement('figure');
+          card.className = 'photo-card';
+
+          const img = document.createElement('img');
+          img.src = photo.src;
+          img.alt = photo.alt || target.title;
+
+          const caption = document.createElement('figcaption');
+          caption.className = 'photo-caption';
+          caption.textContent = photo.caption || photo.alt || '';
+
+          card.append(img, caption);
+          albumPhotosEl.appendChild(card);
+        });
+      }
+
+      showView('albumDetail');
+      setPageTitle(`${albumTitleEl.textContent}｜相簿｜極簡部落格`);
     }
 
     function populateStaticForm() {
@@ -1393,6 +1572,13 @@
         const slug = segments[1] || 'about';
         renderStaticPage(slug);
         navKey = slug;
+      } else if (main === 'albums') {
+        if (segments[1]) {
+          renderAlbumDetail(decodeURIComponent(segments[1]));
+        } else {
+          renderAlbumList();
+        }
+        navKey = 'albums';
       } else {
         currentContext = { type: 'blog', value: null };
         renderList();
@@ -1528,6 +1714,7 @@
     async function init() {
       setDefaultPublishDate();
       await bootstrapPosts();
+      albums = await loadAlbums();
       loadStaticPages();
       populateStaticForm();
       renderManageList();
